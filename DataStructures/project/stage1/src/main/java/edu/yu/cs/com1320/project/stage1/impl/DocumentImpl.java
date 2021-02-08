@@ -18,6 +18,14 @@ public class DocumentImpl implements Document {
     private boolean isTxt = false;
     private boolean isBD = false;
 
+
+    /**
+     * From the Stage 1 assignment doc:
+     * "DocumentImpl must provide the following two constructors,
+     * which should throw an java.lang.IllegalArgumentException if either argument is null or empty/blank:
+     * public DocumentImpl(URI uri, String txt)
+     * public DocumentImpl(URI uri, byte[] binaryData)"
+     */
     public DocumentImpl(URI uri, String txt) throws URISyntaxException {
         if(uri.compareTo(nullUri) == 0){
             throw new IllegalArgumentException("Attempted to construct a txt document with a null uri");
