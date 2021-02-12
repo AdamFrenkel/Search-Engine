@@ -1,11 +1,6 @@
 package edu.yu.cs.com1320.project.impl;
 
-
- //no clue if this is accurate
 import edu.yu.cs.com1320.project.HashTable;
-import edu.yu.cs.com1320.project.stage1.impl.DocumentImpl;
-
- //no clue if this is accurate
 
 public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
 
@@ -16,8 +11,8 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         objAndNextObj nextObj = null;
 
         private objAndNextObj(Key key, Value value){
-            this.value = value;
             this.key = key;
+            this.value = value;
         }
         private Value getValue(){
             return this.value;
@@ -29,20 +24,34 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
             this.nextObj = nextObj;
         }
         private objAndNextObj getNextObj(){
-            return nextObj;
+            return this.nextObj;
         }
     }
 
 
-    private objAndNextObj[] array = new objAndNextObj[5];
+    private objAndNextObj[] array = new objAndNextObj[5]; //still have to fix this, but otherwise looking great BH!
 
     /**
      * @param k the key whose value should be returned
      * @return the value that is stored in the HashTable for k, or null if there is no such key in the table
      */
     public Value get(Key k){
-        int i  = ;//Do some stuff to find out where key goes into array
-        return array[i];
+        int i = k.hashCode() % 5; //This is the slot in the array in which the value might be stored
+        if (array[i] == null) {
+            return null;
+        }
+        if(array[i].getKey().equals(k)){
+            return array[i].getValue();
+        }else{
+            objAndNextObj currentObj = array[i];
+            while(currentObj.getNextObj() != null){
+                currentObj = currentObj.getNextObj();
+                if(currentObj.getKey().equals(k)){
+                    return currentObj.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -56,11 +65,11 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
          * The array that is the base of this table should contain lists.
          * In this method we are creating the members of the list and placing them in their appropriate spots.
          */
+        Value returnValue = this.get(k);  //haven't actually coded this yet
         objAndNextObj newObj = new objAndNextObj(k,v);
-        int i  = ;//Do some stuff to find out where key goes into array
-        if(array[i] = null) {
+        int i = k.hashCode() % 5; //This is the slot in the array in which to store value
+        if(array[i] == null) {
             array[i] = newObj;
-            return null;
         }else{
             objAndNextObj currentObj = array[i];
             boolean placedNewObj = false;
@@ -68,12 +77,12 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
                 if (currentObj.getNextObj() == null) {
                     currentObj.addNextObj(newObj);
                     placedNewObj = true;
-                    return (Value) array[i];  //not really sure what a value is
                 }else{
                     currentObj = currentObj.getNextObj();
                 }
             }
         }
+        return returnValue;
     }
 
 

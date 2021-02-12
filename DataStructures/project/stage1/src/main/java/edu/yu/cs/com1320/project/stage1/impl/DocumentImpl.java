@@ -4,20 +4,17 @@ import edu.yu.cs.com1320.project.stage1.Document;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class DocumentImpl implements Document {
 
-    private URI uri = null; //not sure why this is grey
+    private URI uri = null; //not sure why "null" is grey
     private URI nullUri = null;
     private URI emptyUri = new URI("");
 
     private String txt = null;
     private byte[] binaryData = null;
-
-    private boolean isTxt = false;
-    private boolean isBD = false;
-
 
     /**
      * From the Stage 1 assignment doc:
@@ -41,9 +38,12 @@ public class DocumentImpl implements Document {
         }
         this.uri = uri;
         this.txt = txt;
-        this.isTxt = true;
+
     }
 
+    /**
+     * Look at intro note to txt constructor above^.
+     */
     public DocumentImpl(URI uri, byte[] binaryData) throws URISyntaxException {
         if(uri.compareTo(nullUri) == 0){
             throw new IllegalArgumentException("Attempted to construct a byte document with a null uri");
@@ -59,21 +59,21 @@ public class DocumentImpl implements Document {
         }
         this.uri = uri;
         this.binaryData = binaryData;
-        this.isBD = true;
+
     }
 
     /**
      * @return content of text document
      */
     public String getDocumentTxt(){
-        return txt;
+        return txt; //This will return null if this is a BD doc, as per piazza
     }
 
     /**
      * @return content of binary data document
      */
     public byte[] getDocumentBinaryData(){
-        return binaryData;
+        return binaryData; //This will return null if this is a txt doc, as per piazza
     }
 
     /**
@@ -105,13 +105,14 @@ public class DocumentImpl implements Document {
      * "The hashCode for a Document differs depending on if the document format is a String,
      * in which case it is calculated using java.util.Objects.hash(URI,String), or if the document format is a byte[],
      * in which case it is calculated using java.util.Objects.hash (URI,byte[])."
+     * *In the end this code was given to us on piazza to avoid confusion
      */
     @Override
     public int hashCode() {
-        if (isTxt) {
-            return Objects.hash(uri, txt);
-        }else{
-            return Objects.hash(uri, binaryData);
-        }
+        int result = uri.hashCode();
+        result = 31 * result + (txt != null ? txt.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(binaryData);
+        return result;
     }
+
 }
