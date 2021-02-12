@@ -56,7 +56,8 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
 
     /**
      * @param k the key at which to store the value
-     * @param v the value to store
+     * @param v the value to store.
+     * To delete an entry, put a null value. //Still have to do this
      * @return if the key was already present in the HashTable, return the previous value stored for the key. If the key was not already present, return null.
      */
     public Value put(Key k, Value v){
@@ -65,6 +66,9 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
          * The array that is the base of this table should contain lists.
          * In this method we are creating the members of the list and placing them in their appropriate spots.
          */
+        if(v==null){
+            return this.deleteKey(k);
+        }
         Value returnValue = this.get(k);  //haven't actually coded this yet
         objAndNextObj newObj = new objAndNextObj(k,v);
         int i = k.hashCode() % 5; //This is the slot in the array in which to store value
@@ -83,6 +87,29 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
             }
         }
         return returnValue;
+    }
+
+    private Value deleteKey(Key k){
+        int i = k.hashCode() % 5; //This is the slot in the array in which the value might be stored
+        if (array[i] == null) {
+            return null;
+        }
+        if(array[i].getKey().equals(k)){
+            Value returnValue = array[i].getValue();
+            array[i] = array[i].getNextObj();
+            return returnValue;
+        }else{
+            objAndNextObj currentObj = array[i];
+            while(currentObj.getNextObj() != null){
+                objAndNextObj previousObj = currentObj;
+                currentObj = currentObj.getNextObj();
+                if(currentObj.getKey().equals(k)){
+                    previousObj.addNextObj(currentObj.getNextObj());
+                    return currentObj.getValue();
+                }
+            }
+        }
+        return null;
     }
 
 
