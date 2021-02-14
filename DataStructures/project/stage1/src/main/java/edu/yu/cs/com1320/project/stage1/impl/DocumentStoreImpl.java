@@ -30,6 +30,7 @@ public class DocumentStoreImpl implements DocumentStore {
         }else{
             throw new IllegalArgumentException("format must be either TXT or BINARY.");
         }
+        return 0;
 
     }
 
@@ -37,16 +38,16 @@ public class DocumentStoreImpl implements DocumentStore {
      * @param uri the unique identifier of the document to get
      * @return the given document
      */
-    Document getDocument(URI uri){
-
+    public Document getDocument(URI uri){
+        return null;
     }
 
     /**
      * @param uri the unique identifier of the document to delete
      * @return true if the document is deleted, false if no document exists with that URI
      */
-    boolean deleteDocument(URI uri){
-
+    public boolean deleteDocument(URI uri){
+        return false;
     }
 
 }

@@ -28,22 +28,22 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         }
     }
 
+    private Object[] array = new Object[5]; // BeH this works!
 
-    private objAndNextObj[] array = new objAndNextObj[5]; //still have to fix this, but otherwise looking great BH!
 
     /**
      * @param k the key whose value should be returned
      * @return the value that is stored in the HashTable for k, or null if there is no such key in the table
      */
     public Value get(Key k){
-        int i = k.hashCode() % 5; //This is the slot in the array in which the value might be stored
+        int i = Math.abs(k.hashCode()) % 5; //This is the slot in the array in which the value might be stored
         if (array[i] == null) {
             return null;
         }
-        if(array[i].getKey().equals(k)){
-            return array[i].getValue();
+        if(((objAndNextObj)array[i]).getKey().equals(k)){
+            return ((objAndNextObj)array[i]).getValue();
         }else{
-            objAndNextObj currentObj = array[i];
+            objAndNextObj currentObj = (objAndNextObj)array[i];
             while(currentObj.getNextObj() != null){
                 currentObj = currentObj.getNextObj();
                 if(currentObj.getKey().equals(k)){
@@ -70,22 +70,12 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         if(v==null){
             return this.deleteKey(k);
         }
+        //Put will either replace the current value stored at k, or if k is new it will add it to the end of the proper list.
         Value returnValue = this.get(k);
-        objAndNextObj newObj = new objAndNextObj(k,v);
-        int i = k.hashCode() % 5; //This is the slot in the array in which to store value
-        if(array[i] == null) {
-            array[i] = newObj;
-        }else{
-            objAndNextObj currentObj = array[i];
-            boolean placedNewObj = false;
-            while(!placedNewObj) {
-                if (currentObj.getNextObj() == null) {
-                    currentObj.addNextObj(newObj);
-                    placedNewObj = true;
-                }else{
-                    currentObj = currentObj.getNextObj();
-                }
-            }
+        if(returnValue != null){
+            this.replaceKey(k,v);
+        }else {
+            this.addNewKey(k,v);
         }
         return returnValue;
     }
@@ -94,16 +84,16 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
      * My own method to make the put method shorter.
      */
     private Value deleteKey(Key k){
-        int i = k.hashCode() % 5; //This is the slot in the array in which the value might be stored
+        int i = Math.abs(k.hashCode()) % 5; //This is the slot in the array in which the value might be stored
         if (array[i] == null) {
             return null;
         }
-        if(array[i].getKey().equals(k)){
-            Value returnValue = array[i].getValue();
-            array[i] = array[i].getNextObj();
+        if(((objAndNextObj)array[i]).getKey().equals(k)){
+            Value returnValue = ((objAndNextObj)array[i]).getValue();
+            array[i] = ((objAndNextObj)array[i]).getNextObj();
             return returnValue;
         }else{
-            objAndNextObj currentObj = array[i];
+            objAndNextObj currentObj = (objAndNextObj)array[i];
             while(currentObj.getNextObj() != null){
                 objAndNextObj previousObj = currentObj;
                 currentObj = currentObj.getNextObj();
@@ -114,6 +104,50 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
             }
         }
         return null;
+    }
+
+    /**
+     * My own method to make the put method shorter.
+     */
+    private void addNewKey(Key k, Value v){
+        objAndNextObj newObj = new objAndNextObj(k, v);
+        int i = Math.abs(k.hashCode()) % 5; //This is the slot in the array in which to store value
+        if (array[i] == null) {
+            array[i] = newObj;
+        } else {
+            objAndNextObj currentObj = (objAndNextObj) array[i];
+            boolean placedNewObj = false;
+            while (!placedNewObj) {
+                if (currentObj.getNextObj() == null) {
+                    currentObj.addNextObj(newObj);
+                    placedNewObj = true;
+                } else {
+                    currentObj = currentObj.getNextObj();
+                }
+            }
+        }
+    }
+
+    /**
+     * My own method to make the put method shorter.
+     */
+    private void replaceKey(Key k, Value v){
+        objAndNextObj newObj = new objAndNextObj(k, v);
+        int i = Math.abs(k.hashCode()) % 5; //This is the slot in the array in which the value is stored
+        if(((objAndNextObj)array[i]).getKey().equals(k)){
+            newObj.addNextObj(((objAndNextObj)array[i]).getNextObj());
+            array[i] = newObj;
+        }else{
+            objAndNextObj currentObj = (objAndNextObj)array[i];
+            while(currentObj.getNextObj() != null){
+                objAndNextObj previousObj = currentObj;
+                currentObj = currentObj.getNextObj();
+                if(currentObj.getKey().equals(k)){
+                    newObj.addNextObj(currentObj.getNextObj());
+                    previousObj.addNextObj(newObj);
+                }
+            }
+        }
     }
 
 

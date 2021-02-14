@@ -27,7 +27,7 @@ public class DocumentImpl implements Document {
         if(uri.compareTo(nullUri) == 0){
             throw new IllegalArgumentException("Attempted to construct a txt document with a null uri");
         }
-        if(uri.compareTo(emptyUri) == 0) { //I believe this is enough
+        if(uri.compareTo(emptyUri) == 0) { //I believe this is enough //although really should ask
             throw new IllegalArgumentException("Attempted to construct a txt document with an empty uri");
         }
         if(txt.equals(null)){
