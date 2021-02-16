@@ -10,8 +10,7 @@ import java.util.Objects;
 public class DocumentImpl implements Document {
 
     private URI uri = null; //not sure why "null" is grey
-    private URI nullUri = null;
-    private URI emptyUri = new URI("");
+    private URI emptyUri;
 
     private String txt = null;
     private byte[] binaryData = null;
@@ -23,14 +22,21 @@ public class DocumentImpl implements Document {
      * public DocumentImpl(URI uri, String txt)
      * public DocumentImpl(URI uri, byte[] binaryData)"
      */
-    public DocumentImpl(URI uri, String txt) throws URISyntaxException {
-        if(uri.compareTo(nullUri) == 0){
+    public DocumentImpl(URI uri, String txt)  {
+        if(uri == null){
             throw new IllegalArgumentException("Attempted to construct a txt document with a null uri");
         }
-        if(uri.compareTo(emptyUri) == 0) { //I believe this is enough //although really should ask
-            throw new IllegalArgumentException("Attempted to construct a txt document with an empty uri");
+        try {
+            emptyUri = new URI("");
         }
-        if(txt.equals(null)){
+        catch (URISyntaxException e){
+            throw new IllegalArgumentException("URI Syntx exception");
+        }
+            if (uri.compareTo(emptyUri) == 0) { //I believe this is enough //although really should ask
+                throw new IllegalArgumentException("Attempted to construct a txt document with an empty uri");
+            }
+
+        if(txt == null){
             throw new IllegalArgumentException("Attempted to construct a txt document with a null string");
         }
         if(txt.isEmpty()){
@@ -44,9 +50,15 @@ public class DocumentImpl implements Document {
     /**
      * Look at intro note to txt constructor above^.
      */
-    public DocumentImpl(URI uri, byte[] binaryData) throws URISyntaxException {
-        if(uri.compareTo(nullUri) == 0){
+    public DocumentImpl(URI uri, byte[] binaryData)  {
+        if(uri == null){
             throw new IllegalArgumentException("Attempted to construct a byte document with a null uri");
+        }
+        try {
+            emptyUri = new URI("");
+        }
+        catch (URISyntaxException e){
+            throw new IllegalArgumentException("URI Syntx exception");
         }
         if(uri.compareTo(emptyUri) == 0) { // * I believe this is enough
             throw new IllegalArgumentException("Attempted to construct a byte document with an empty uri");
