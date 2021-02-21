@@ -33,6 +33,11 @@ public class DocumentStoreImpl implements DocumentStore {
     public int putDocument(InputStream input, URI uri, DocumentStore.DocumentFormat format) throws IOException {
         //***Read the entire contents of the document from the InputStream into a byte[] ****Don't know how to do this
         DocumentImpl docReturn;
+        if (input == null) {
+            docReturn = (DocumentImpl)hashTable.put(uri, null);
+            return docReturn == null ? 0 : docReturn.hashCode();
+        }
+
         byte[] bD = input.readAllBytes();
         DocumentImpl doc;
         switch(format){
@@ -40,19 +45,11 @@ public class DocumentStoreImpl implements DocumentStore {
                 String txt = new String(bD);
                 doc = new DocumentImpl(uri, txt);
                 docReturn = (DocumentImpl)hashTable.put(uri, doc);
-                if(docReturn == null){
-                    return 0;
-                }else{
-                    return docReturn.hashCode();
-                }
+                return docReturn == null ? 0 : docReturn.hashCode();
             case BINARY:
                 doc = new DocumentImpl(uri, bD);
                 docReturn = (DocumentImpl)hashTable.put(uri, doc);
-                if(docReturn == null){
-                    return 0;
-                }else{
-                    return docReturn.hashCode();
-                }
+                return docReturn == null ? 0 : docReturn.hashCode();
             default:
                 throw new IllegalArgumentException("format must be either TXT or BINARY.");
         }

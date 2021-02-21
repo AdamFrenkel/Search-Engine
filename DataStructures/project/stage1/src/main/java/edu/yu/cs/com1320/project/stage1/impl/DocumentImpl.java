@@ -30,7 +30,7 @@ public class DocumentImpl implements Document {
             emptyUri = new URI("");
         }
         catch (URISyntaxException e){
-            throw new IllegalArgumentException("URI Syntx exception");
+            throw new IllegalArgumentException("URI Syntax exception");
         }
             if (uri.compareTo(emptyUri) == 0) { //I believe this is enough //although really should ask
                 throw new IllegalArgumentException("Attempted to construct a txt document with an empty uri");
@@ -58,7 +58,7 @@ public class DocumentImpl implements Document {
             emptyUri = new URI("");
         }
         catch (URISyntaxException e){
-            throw new IllegalArgumentException("URI Syntx exception");
+            throw new IllegalArgumentException("URI Syntax exception");
         }
         if(uri.compareTo(emptyUri) == 0) { // * I believe this is enough
             throw new IllegalArgumentException("Attempted to construct a byte document with an empty uri");
