@@ -16,7 +16,7 @@ public class DocumentStoreImpl implements DocumentStore {
     private StackImpl commandStack = new StackImpl();
     private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
     private HashTableImpl<URI, Document> deletedDocsHT = new HashTableImpl<>();
-
+    private HashTableImpl<URI, Document> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
     /**
      * the two document formats supported by this document store.
      * Note that TXT means plain text, i.e. a String.
@@ -37,35 +37,40 @@ public class DocumentStoreImpl implements DocumentStore {
         //First Piece is a delete
         DocumentImpl docReturn;
         if (input == null) {
-            Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri);
+            Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
             commandStack.push(new Command(uri, undoDeleteFunction));
             docReturn = (DocumentImpl)hashTable.put(uri, null);
             deletedDocsHT.put(uri, docReturn);//Remember this can be null
             return docReturn == null ? 0 : docReturn.hashCode();
         }
         //Second piece is an add
-        Function<URI,Boolean> undoPutFunction= uri1 -> this.undoPutDocument(uri1);
         byte[] bD = input.readAllBytes();
         DocumentImpl doc;
-        switch(format){
-            case TXT:
-                String txt = new String(bD);
-                doc = new DocumentImpl(uri, txt);
-                docReturn = (DocumentImpl)hashTable.put(uri, doc);
-                commandStack.push(new Command(uri, undoPutFunction));
-                return docReturn == null ? 0 : docReturn.hashCode();
-            case BINARY:
+        if(format == DocumentStore.DocumentFormat.TXT) {
+            String txt = new String(bD);
+            doc = new DocumentImpl(uri, txt);
+        }else{
                 doc = new DocumentImpl(uri, bD);
-                docReturn = (DocumentImpl)hashTable.put(uri, doc);
-                commandStack.push(new Command(uri, undoPutFunction));
-                return docReturn == null ? 0 : docReturn.hashCode();
-            default:
-                throw new IllegalArgumentException("format must be either TXT or BINARY.");
+        }
+        docReturn = (DocumentImpl)hashTable.put(uri, doc);
+        if(docReturn == null) {
+            Function<URI,Boolean> undoPutFunction= uri1 -> this.undoPutDocument(uri1);
+            commandStack.push(new Command(uri, undoPutFunction));
+            return 0;
+        }else{
+            replacedDocsHT.put(uri, docReturn); //This isn't docReturn's uri, because wont have access to that when trying to undo
+            Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
+            return docReturn.hashCode();
         }
     }
 
-    private Boolean undoPutDocument(URI uri) {
-        if(hashTable.put(uri, null) == null){
+    private Boolean undoReplaceDocument(URI uri1) {
+        hashTable.put(uri1, replacedDocsHT.get(uri1));
+        return true;
+    }
+
+    private Boolean undoPutDocument(URI uri1) {
+        if(hashTable.put(uri1, null) == null){
             return false;
         }
         return true;
@@ -95,9 +100,9 @@ public class DocumentStoreImpl implements DocumentStore {
         return true;
     }
 
-    private Boolean undoDeleteDocument(URI uri) {
-        DocumentImpl doc = (DocumentImpl) deletedDocsHT.get(uri);
-        hashTable.put(uri,doc);
+    private Boolean undoDeleteDocument(URI uri1) {
+        DocumentImpl doc = (DocumentImpl) deletedDocsHT.get(uri1);
+        hashTable.put(uri1,doc);
         return true;
     }
 
