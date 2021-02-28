@@ -2,13 +2,19 @@ package edu.yu.cs.com1320.project.impl;
 
 import edu.yu.cs.com1320.project.Stack;
 
+import java.util.LinkedList;
+
 public class StackImpl<T> implements Stack<T> {
+    LinkedList linkedList = new LinkedList();
+    int stackSize = 0;
     /**
      * @param element object to add to the Stack
      */
     @Override
     public void push(T element){
 
+        linkedList.addFirst(element);
+        this.stackSize++;
     }
 
     /**
@@ -17,7 +23,9 @@ public class StackImpl<T> implements Stack<T> {
      */
     @Override
     public T pop(){
-
+        T returnT = (T) linkedList.removeFirst();
+        this.stackSize--;
+        return returnT;
     }
 
     /**
@@ -26,7 +34,7 @@ public class StackImpl<T> implements Stack<T> {
      */
     @Override
     public T peek(){
-
+        return (T) linkedList.getFirst();
     }
 
     /**
@@ -35,6 +43,6 @@ public class StackImpl<T> implements Stack<T> {
      */
     @Override
     public int size(){
-
+        return this.stackSize;
     }
 }

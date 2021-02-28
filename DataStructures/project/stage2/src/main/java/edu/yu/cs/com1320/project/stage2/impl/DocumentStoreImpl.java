@@ -37,10 +37,12 @@ public class DocumentStoreImpl implements DocumentStore {
         //First Piece is a delete
         DocumentImpl docReturn;
         if (input == null) {
+            docReturn = (DocumentImpl)hashTable.put(uri, null);
+            //These next few lines are need for undo purposes
+            deletedDocsHT.put(uri, docReturn);//Remember this can be null
             Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
             commandStack.push(new Command(uri, undoDeleteFunction));
-            docReturn = (DocumentImpl)hashTable.put(uri, null);
-            deletedDocsHT.put(uri, docReturn);//Remember this can be null
+            //These previous few lines are need for undo purposes
             return docReturn == null ? 0 : docReturn.hashCode();
         }
         //Second piece is an add
@@ -54,12 +56,15 @@ public class DocumentStoreImpl implements DocumentStore {
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
         if(docReturn == null) {
+            //These next few lines are need for undo purposes
             Function<URI,Boolean> undoPutFunction= uri1 -> this.undoPutDocument(uri1);
             commandStack.push(new Command(uri, undoPutFunction));
+            //These previous few lines are need for undo purposes
             return 0;
         }else{
             replacedDocsHT.put(uri, docReturn); //This isn't docReturn's uri, because wont have access to that when trying to undo
             Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
+            commandStack.push(new Command(uri, undoReplaceFunction));
             return docReturn.hashCode();
         }
     }
@@ -91,9 +96,12 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public boolean deleteDocument(URI uri){
-        Function<URI,Boolean> function= undoDel -> DocumentStoreImpl.this.undoDeleteDocument(uri);
-        commandStack.push(new Command(uri, function));
         DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
+        //These next few lines are all needed for undo purposes
+        deletedDocsHT.put(uri, doc);//Remember this can be null
+        Function<URI,Boolean> undoDeleteFunction= undoDel -> DocumentStoreImpl.this.undoDeleteDocument(uri);
+        commandStack.push(new Command(uri, undoDeleteFunction));
+        //Previous lines were needed for undo purposes
         if(doc == null){
             return false;
         }
@@ -112,9 +120,13 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public void undo() throws IllegalStateException {
+
         if(commandStack.size()>0){
+
             Command undoCommand = (Command) commandStack.pop();
+
             undoCommand.undo();
+
         }else{
             throw new IllegalStateException("there are no actions to be undone");
         }

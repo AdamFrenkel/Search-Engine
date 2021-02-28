@@ -18,6 +18,7 @@ public final class Command {
     }
 
     public boolean undo() {
+
         return undo.apply(this.uri);
     }
 }

@@ -33,11 +33,13 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
     private Object[] array;
     int arraySize;
     int numberOfElementsInHT;
+    int currentSlotInHolder = 0;
 
     public HashTableImpl(){
         array = new Object[5];
         arraySize = 5;
         numberOfElementsInHT = 0;
+
 
     }
 
@@ -149,7 +151,8 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         //and then to put() all the elements into a HashTable twice the size (array).
         //O(2n)
         Object[] holderArray = new Object[numberOfElementsInHT];
-        int currentSlotInHolder = 0;
+        numberOfElementsInHT = 0;
+        currentSlotInHolder = 0;
         for(int i = 0; i < array.length; i++){
             if(array[i] != null){
                 holderArray[currentSlotInHolder] = array[i];
@@ -163,10 +166,18 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
             }
         }
         arraySize = arraySize * 2;
-        array = new Object[arraySize];;
+        Object[] array2 = new Object[arraySize];
+
+
+        array = array2;
+
         for(int j = 0; j < holderArray.length; j++){
-            put(((objAndNextObj)holderArray[j]).getKey(), ((objAndNextObj)holderArray[j]).getValue());
+
+
+
+            this.put(((objAndNextObj)holderArray[j]).getKey(), ((objAndNextObj)holderArray[j]).getValue());
         }
+
     }
 
 
