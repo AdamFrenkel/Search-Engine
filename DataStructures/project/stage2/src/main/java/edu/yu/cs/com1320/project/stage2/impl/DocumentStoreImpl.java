@@ -34,7 +34,6 @@ public class DocumentStoreImpl implements DocumentStore {
         //First Piece is a delete
         DocumentImpl docReturn;
         if (input == null) {
-            System.out .println("Delete");
             docReturn = (DocumentImpl)hashTable.put(uri, null);
             //These next few lines are need for undo purposes
             if(!(deletedDocsHT.get(uri) instanceof StackImpl)){
@@ -60,7 +59,7 @@ public class DocumentStoreImpl implements DocumentStore {
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
         if(docReturn == null) {
             //These next few lines are need for undo purposes
-            System.out .println("Put");
+
             Function<URI,Boolean> undoPutFunction = uri1 -> this.undoPutDocument(uri1);
             commandStack.push(new Command(uri, undoPutFunction));
             //These previous few lines are need for undo purposes
@@ -72,7 +71,7 @@ public class DocumentStoreImpl implements DocumentStore {
             }
             StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
             stack.push(docReturn);//Remember this can be null
-            System.out .println("Replace");
+
             Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
             commandStack.push(new Command(uri, undoReplaceFunction));
             return docReturn.hashCode();
@@ -80,7 +79,7 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
     private Boolean undoReplaceDocument(URI uri1) {
-        System.out .println("UndoReplace");
+       
         hashTable.put(uri1, (DocumentImpl) (replacedDocsHT.get(uri1).pop()));
         return true;
     }
@@ -171,7 +170,9 @@ public class DocumentStoreImpl implements DocumentStore {
                     currentCommand.undo();
                     haventFoundURI = false;
                 }
-                holderStack.push(currentCommand);
+                if(haventFoundURI == true) {
+                    holderStack.push(currentCommand);
+                }
             }else{
                 while (holderStack.size()>0){
                     commandStack.push(holderStack.pop());

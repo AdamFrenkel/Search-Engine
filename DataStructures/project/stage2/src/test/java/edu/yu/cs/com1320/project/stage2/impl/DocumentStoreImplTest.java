@@ -241,17 +241,17 @@ public class DocumentStoreImplTest {
             String str2 = "2"; byte[] array2 = str2.getBytes();
             ByteArrayInputStream stream2 = new ByteArrayInputStream(array2); ByteArrayInputStream stream22 = new ByteArrayInputStream(array2);
                 assertEquals(doc.hashCode(), store.putDocument(stream2, uri, DocumentStore.DocumentFormat.BINARY));
-//            Document doc2 = new DocumentImpl(uri, stream22.readAllBytes());
-//            assertEquals(doc2, store.getDocument(uri));
-//            System.out .println("here1");
-//                assertTrue(store.deleteDocument(uri)); assertEquals(null, store.getDocument(uri));
-//            String str3 = "3"; byte[] array3 = str3.getBytes();
-//            ByteArrayInputStream stream3 = new ByteArrayInputStream(array3); ByteArrayInputStream stream33 = new ByteArrayInputStream(array3);
-//                assertEquals(0, store.putDocument(stream3, uri, DocumentStore.DocumentFormat.BINARY));
-//            Document doc3 = new DocumentImpl(uri, stream33.readAllBytes());
-//            assertEquals(doc3, store.getDocument(uri));
-//            store.undo(uri); assertEquals(null, store.getDocument(uri));
-//            store.undo(uri); assertEquals(doc2, store.getDocument(uri));
+            Document doc2 = new DocumentImpl(uri, stream22.readAllBytes());
+            assertEquals(doc2, store.getDocument(uri));
+            System.out .println("here1");
+                assertTrue(store.deleteDocument(uri)); assertEquals(null, store.getDocument(uri));
+            String str3 = "3"; byte[] array3 = str3.getBytes();
+            ByteArrayInputStream stream3 = new ByteArrayInputStream(array3); ByteArrayInputStream stream33 = new ByteArrayInputStream(array3);
+                assertEquals(0, store.putDocument(stream3, uri, DocumentStore.DocumentFormat.BINARY));
+            Document doc3 = new DocumentImpl(uri, stream33.readAllBytes());
+            assertEquals(doc3, store.getDocument(uri));
+            store.undo(uri); assertEquals(null, store.getDocument(uri));
+            store.undo(uri); assertEquals(doc2, store.getDocument(uri));
            store.undo(uri); assertEquals(doc, store.getDocument(uri));
             store.undo(uri); assertEquals(null, store.getDocument(uri));
         }
