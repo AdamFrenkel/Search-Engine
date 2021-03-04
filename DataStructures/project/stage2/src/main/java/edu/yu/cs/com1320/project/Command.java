@@ -18,7 +18,7 @@ public final class Command {
     }
 
     public boolean undo() {
-        System.out .println("Command undo calls method:");
+
         return undo.apply(this.uri);
     }
 }

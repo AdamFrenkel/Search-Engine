@@ -243,7 +243,6 @@ public class DocumentStoreImplTest {
                 assertEquals(doc.hashCode(), store.putDocument(stream2, uri, DocumentStore.DocumentFormat.BINARY));
             Document doc2 = new DocumentImpl(uri, stream22.readAllBytes());
             assertEquals(doc2, store.getDocument(uri));
-            System.out .println("here1");
                 assertTrue(store.deleteDocument(uri)); assertEquals(null, store.getDocument(uri));
             String str3 = "3"; byte[] array3 = str3.getBytes();
             ByteArrayInputStream stream3 = new ByteArrayInputStream(array3); ByteArrayInputStream stream33 = new ByteArrayInputStream(array3);

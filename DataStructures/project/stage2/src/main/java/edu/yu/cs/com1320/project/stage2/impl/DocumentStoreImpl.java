@@ -35,16 +35,7 @@ public class DocumentStoreImpl implements DocumentStore {
         DocumentImpl docReturn;
         if (input == null) {
             docReturn = (DocumentImpl)hashTable.put(uri, null);
-            //These next few lines are need for undo purposes
-            if(!(deletedDocsHT.get(uri) instanceof StackImpl)){
-                StackImpl<DocumentImpl> newStack = new StackImpl<>();
-                deletedDocsHT.put(uri, newStack);
-            }
-            StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
-            stack.push(docReturn);//Remember this can be null
-            Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
-            commandStack.push(new Command(uri, undoDeleteFunction));
-            //These previous few lines are need for undo purposes
+            this.deleteFromPut(uri, docReturn);
             return docReturn == null ? 0 : docReturn.hashCode();
         }
         //Second piece is an add
@@ -57,9 +48,13 @@ public class DocumentStoreImpl implements DocumentStore {
             doc = new DocumentImpl(uri, bD);
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
+        return this.putFromPut(uri,docReturn);
+    }
+
+    //Whole purpose is to make put method shorter
+    private int putFromPut(URI uri,DocumentImpl docReturn){
         if(docReturn == null) {
             //These next few lines are need for undo purposes
-
             Function<URI,Boolean> undoPutFunction = uri1 -> this.undoPutDocument(uri1);
             commandStack.push(new Command(uri, undoPutFunction));
             //These previous few lines are need for undo purposes
@@ -71,21 +66,35 @@ public class DocumentStoreImpl implements DocumentStore {
             }
             StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
             stack.push(docReturn);//Remember this can be null
-
             Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
             commandStack.push(new Command(uri, undoReplaceFunction));
             return docReturn.hashCode();
         }
     }
 
+    //Whole purpose is to make put method shorter
+    private void deleteFromPut(URI uri,DocumentImpl docReturn){
+        //These next few lines are need for undo purposes
+        if(!(deletedDocsHT.get(uri) instanceof StackImpl)){
+            StackImpl<DocumentImpl> newStack = new StackImpl<>();
+            deletedDocsHT.put(uri, newStack);
+        }
+        StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+        stack.push(docReturn);//Remember this can be null
+        Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
+        commandStack.push(new Command(uri, undoDeleteFunction));
+        //These previous few lines are need for undo purposes
+    }
+
+
+
     private Boolean undoReplaceDocument(URI uri1) {
-       
         hashTable.put(uri1, (DocumentImpl) (replacedDocsHT.get(uri1).pop()));
         return true;
     }
 
     private Boolean undoPutDocument(URI uri1) {
-        System.out .println("UndoPut");
+
         if(hashTable.put(uri1, null) == null){
             return false;
         }
@@ -107,7 +116,7 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public boolean deleteDocument(URI uri){
-        System.out .println("Delete");
+
         DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
         //These next few lines are all needed for undo purposes
         if(deletedDocsHT.get(uri) == null){
@@ -128,7 +137,7 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
     private Boolean undoDeleteDocument(URI uri1) {
-        System.out .println("UndoDelete");
+
         DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
         hashTable.put(uri1, doc);
         return true;
