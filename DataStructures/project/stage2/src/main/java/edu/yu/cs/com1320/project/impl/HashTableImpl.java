@@ -48,6 +48,9 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
      * @return the value that is stored in the HashTable for k, or null if there is no such key in the table
      */
     public Value get(Key k){
+        if(k == null){
+            throw new IllegalArgumentException("Tried to get a null key");
+        }
         int i = Math.abs(k.hashCode()) % arraySize; //This is the slot in the array in which the value might be stored
         if (array[i] == null) {
             return null;
@@ -73,7 +76,9 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
      * @return if the key was already present in the HashTable, return the previous value stored for the key. If the key was not already present, return null.
      */
     public Value put(Key k, Value v){
-
+        if(k == null){
+            throw new IllegalArgumentException("Tried to put a null key");
+        }
         /**
          * My own note explaining what this method does:
          * The array that is the base of this table should contain lists.
@@ -97,6 +102,9 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
      * My own method to make the put method shorter.
      */
     private Value deleteKey(Key k){
+        if(k == null){
+            throw new IllegalArgumentException("Tried to delete a null key");
+        }
         numberOfElementsInHT--;
         int i = Math.abs(k.hashCode()) % arraySize; //This is the slot in the array in which the value might be stored
         if (array[i] == null) {
@@ -167,14 +175,8 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         }
         arraySize = arraySize * 2;
         Object[] array2 = new Object[arraySize];
-
-
         array = array2;
-
         for(int j = 0; j < holderArray.length; j++){
-
-
-
             this.put(((objAndNextObj)holderArray[j]).getKey(), ((objAndNextObj)holderArray[j]).getValue());
         }
 

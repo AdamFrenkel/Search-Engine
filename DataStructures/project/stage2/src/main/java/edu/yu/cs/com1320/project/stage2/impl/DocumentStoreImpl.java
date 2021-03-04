@@ -89,12 +89,17 @@ public class DocumentStoreImpl implements DocumentStore {
 
 
     private Boolean undoReplaceDocument(URI uri1) {
+        if(uri1 == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
         hashTable.put(uri1, (DocumentImpl) (replacedDocsHT.get(uri1).pop()));
         return true;
     }
 
     private Boolean undoPutDocument(URI uri1) {
-
+        if(uri1 == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
         if(hashTable.put(uri1, null) == null){
             return false;
         }
@@ -107,6 +112,9 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public Document getDocument(URI uri){
+        if(uri == null){
+            throw new IllegalArgumentException("Tried to get a null URI");
+        }
         return (Document) hashTable.get(uri);
     }
 
@@ -116,7 +124,9 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public boolean deleteDocument(URI uri){
-
+        if(uri == null){
+            throw new IllegalArgumentException("Tried to delete a null URI");
+        }
         DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
         //These next few lines are all needed for undo purposes
         if(deletedDocsHT.get(uri) == null){
@@ -137,7 +147,9 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
     private Boolean undoDeleteDocument(URI uri1) {
-
+        if(uri1 == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
         DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
         hashTable.put(uri1, doc);
         return true;
@@ -169,7 +181,9 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public void undo(URI uri) throws IllegalStateException {
-
+        if(uri == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
         Boolean haventFoundURI = true;
         StackImpl holderStack = new StackImpl();
         while(haventFoundURI){

@@ -5,8 +5,11 @@ import edu.yu.cs.com1320.project.Stack;
 import java.util.LinkedList;
 
 public class StackImpl<T> implements Stack<T> {
-    LinkedList linkedList = new LinkedList();
+    LinkedList linkedList;
     int stackSize = 0;
+    public StackImpl(){
+        linkedList = new LinkedList();
+    }
     /**
      * @param element object to add to the Stack
      */
