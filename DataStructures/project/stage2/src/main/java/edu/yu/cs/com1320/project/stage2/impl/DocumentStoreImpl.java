@@ -15,15 +15,9 @@ import java.util.function.Function;
 public class DocumentStoreImpl implements DocumentStore {
     private StackImpl commandStack = new StackImpl();
     private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
-    private HashTableImpl<URI, Document> deletedDocsHT = new HashTableImpl<>();
-    private HashTableImpl<URI, Document> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
-    /**
-     * the two document formats supported by this document store.
-     * Note that TXT means plain text, i.e. a String.
-     */
-    public enum DocumentFormat{
-        TXT,BINARY
-    };
+    private HashTableImpl<URI, StackImpl> deletedDocsHT = new HashTableImpl<>();
+    private HashTableImpl<URI, StackImpl> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
+
     /**
      * @param input the document being put
      * @param uri unique identifier for the document
@@ -34,12 +28,21 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public int putDocument(InputStream input, URI uri, DocumentStore.DocumentFormat format) throws IOException {
+        if(uri == null || format == null){
+            throw new IllegalArgumentException("uri or format is null");
+        }
         //First Piece is a delete
         DocumentImpl docReturn;
         if (input == null) {
+            System.out .println("Delete");
             docReturn = (DocumentImpl)hashTable.put(uri, null);
             //These next few lines are need for undo purposes
-            deletedDocsHT.put(uri, docReturn);//Remember this can be null
+            if(!(deletedDocsHT.get(uri) instanceof StackImpl)){
+                StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                deletedDocsHT.put(uri, newStack);
+            }
+            StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+            stack.push(docReturn);//Remember this can be null
             Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
             commandStack.push(new Command(uri, undoDeleteFunction));
             //These previous few lines are need for undo purposes
@@ -52,17 +55,24 @@ public class DocumentStoreImpl implements DocumentStore {
             String txt = new String(bD);
             doc = new DocumentImpl(uri, txt);
         }else{
-                doc = new DocumentImpl(uri, bD);
+            doc = new DocumentImpl(uri, bD);
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
         if(docReturn == null) {
             //These next few lines are need for undo purposes
-            Function<URI,Boolean> undoPutFunction= uri1 -> this.undoPutDocument(uri1);
+            System.out .println("Put");
+            Function<URI,Boolean> undoPutFunction = uri1 -> this.undoPutDocument(uri1);
             commandStack.push(new Command(uri, undoPutFunction));
             //These previous few lines are need for undo purposes
             return 0;
         }else{
-            replacedDocsHT.put(uri, docReturn); //This isn't docReturn's uri, because wont have access to that when trying to undo
+            if(replacedDocsHT.get(uri) == null){
+                StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                replacedDocsHT.put(uri, newStack);
+            }
+            StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
+            stack.push(docReturn);//Remember this can be null
+            System.out .println("Replace");
             Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
             commandStack.push(new Command(uri, undoReplaceFunction));
             return docReturn.hashCode();
@@ -70,11 +80,13 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
     private Boolean undoReplaceDocument(URI uri1) {
-        hashTable.put(uri1, replacedDocsHT.get(uri1));
+        System.out .println("UndoReplace");
+        hashTable.put(uri1, (DocumentImpl) (replacedDocsHT.get(uri1).pop()));
         return true;
     }
 
     private Boolean undoPutDocument(URI uri1) {
+        System.out .println("UndoPut");
         if(hashTable.put(uri1, null) == null){
             return false;
         }
@@ -96,21 +108,30 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public boolean deleteDocument(URI uri){
+        System.out .println("Delete");
         DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
         //These next few lines are all needed for undo purposes
-        deletedDocsHT.put(uri, doc);//Remember this can be null
-        Function<URI,Boolean> undoDeleteFunction= undoDel -> DocumentStoreImpl.this.undoDeleteDocument(uri);
+        if(deletedDocsHT.get(uri) == null){
+            StackImpl<DocumentImpl> newStack = new StackImpl<>();
+            deletedDocsHT.put(uri, newStack);
+        }
+        StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+
+        stack.push(doc);//Remember this can be null
+        Function<URI,Boolean> undoDeleteFunction= uri1 -> this.undoDeleteDocument(uri1);
         commandStack.push(new Command(uri, undoDeleteFunction));
         //Previous lines were needed for undo purposes
         if(doc == null){
             return false;
         }
+
         return true;
     }
 
     private Boolean undoDeleteDocument(URI uri1) {
-        DocumentImpl doc = (DocumentImpl) deletedDocsHT.get(uri1);
-        hashTable.put(uri1,doc);
+        System.out .println("UndoDelete");
+        DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
+        hashTable.put(uri1, doc);
         return true;
     }
 
@@ -140,6 +161,7 @@ public class DocumentStoreImpl implements DocumentStore {
      */
     @Override
     public void undo(URI uri) throws IllegalStateException {
+
         Boolean haventFoundURI = true;
         StackImpl holderStack = new StackImpl();
         while(haventFoundURI){
@@ -151,6 +173,9 @@ public class DocumentStoreImpl implements DocumentStore {
                 }
                 holderStack.push(currentCommand);
             }else{
+                while (holderStack.size()>0){
+                    commandStack.push(holderStack.pop());
+                }
                 throw new IllegalStateException("there are no actions on the command stack for the given URI");
             }
         }
