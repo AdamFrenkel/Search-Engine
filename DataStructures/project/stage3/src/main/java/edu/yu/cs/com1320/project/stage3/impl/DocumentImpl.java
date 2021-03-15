@@ -6,6 +6,7 @@ import edu.yu.cs.com1320.project.stage3.Document;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DocumentImpl implements Document {
@@ -15,7 +16,9 @@ public class DocumentImpl implements Document {
 
     private String txt = null;
     private byte[] binaryData = null;
+
     private HashTableImpl<String, Integer> wordCount = new HashTableImpl<>();
+    private Set<String> words = new HashSet<>();
 
     /**
      * From the Stage 1 assignment doc:
@@ -46,7 +49,7 @@ public class DocumentImpl implements Document {
         }
         this.uri = uri;
         this.txt = txt;
-        this.addWordsToHT(txt);
+        this.addWordsToHtAndSet(txt);
     }
 
     /**
@@ -75,17 +78,19 @@ public class DocumentImpl implements Document {
         this.binaryData = binaryData;
 
         String string = new String(binaryData);
-        this.addWordsToHT(string);
+        this.addWordsToHtAndSet(string);
 
     }
 
-    private void addWordsToHT(String txt){
+    private void addWordsToHtAndSet(String txt){
+
         //removing anything that's not txt or string
         txt.replaceAll("[^a-zA-Z0-9\\s]", "");
         //this makes it case insensitive
         txt.toLowerCase();
         //this gets the individual words
         String[] words = txt.split(" ");
+        this.words.addAll(Arrays.asList(words));
         for(int i = 0; i < words.length; i++){
             if(wordCount.get(words[i]) == null){
                 wordCount.put(words[i], 1);
@@ -151,11 +156,12 @@ public class DocumentImpl implements Document {
 
     @Override
     public int wordCount(String word) {
-        return 0;
+        return wordCount.get(word) == null ? 0 : wordCount.get(word);
+
     }
 
     @Override
     public Set<String> getWords() {
-        return null;
+        return words;
     }
 }

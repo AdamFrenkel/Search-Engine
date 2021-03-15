@@ -2,10 +2,7 @@ package edu.yu.cs.com1320.project.impl;
 
 import edu.yu.cs.com1320.project.Trie;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TrieImpl<Value> implements Trie<Value> {
 
@@ -48,11 +45,11 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @param d
      * @return
      */
-    private TrieImpl.Node put(TrieImpl.Node x, String key, Value val, int d)
+    private Node put(Node x, String key, Value val, int d)
     {
         //create a new node
         if (x == null) {
-            x = new TrieImpl.Node();
+            x = new Node();
         }
 
         //we've reached the last node in the key,
@@ -76,8 +73,21 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @param comparator used to sort  values
      * @return a List of matching Values, in descending order
      */
-    List<Value> getAllSorted(String key, Comparator<Value> comparator){
-
+    public List<Value> getAllSorted(String key, Comparator<Value> comparator){
+        Node currentNode = root;
+        for(int i = 0; i<key.length(); i++){
+            if(currentNode.links[Character.toLowerCase(key.charAt(i))] == null){
+                return null;
+            }
+            currentNode = currentNode.links[Character.toLowerCase(key.charAt(i))];
+        }
+        if(currentNode.val == null){
+            return new ArrayList<>();
+        }
+        List<Value> values = new ArrayList<>();
+        values.addAll(currentNode.val);
+        values.sort(comparator);
+        return values;
     }
 
     /**
@@ -97,9 +107,13 @@ public class TrieImpl<Value> implements Trie<Value> {
             currentNode = currentNode.links[Character.toLowerCase(prefix.charAt(i))];
         }
         this.getAllWithPrefix(currentNode);
-
+        prefixes.sort(comparator);
+        List<Value> returnPrefixes = prefixes;
+        prefixes = new ArrayList<Value>();
+        return returnPrefixes;
     }
-    private Set<Value> unsortedSet = new HashSet<>();
+
+    private List<Value> prefixes = new ArrayList<Value>();
     private void getAllWithPrefix(Node x){
         for(int i = 0; i < x.links.length; i++){
             if(x.links[i] != null){
@@ -107,7 +121,7 @@ public class TrieImpl<Value> implements Trie<Value> {
             }
         }
         if(x.val != null){
-            unsortedSet.addAll(x.val);
+            prefixes.addAll(x.val);
         }
     }
     /**
