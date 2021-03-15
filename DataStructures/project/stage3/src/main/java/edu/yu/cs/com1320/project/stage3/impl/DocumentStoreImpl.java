@@ -4,12 +4,17 @@ package edu.yu.cs.com1320.project.stage3.impl;
 import edu.yu.cs.com1320.project.CommandSet;
 import edu.yu.cs.com1320.project.impl.HashTableImpl;
 import edu.yu.cs.com1320.project.impl.StackImpl;
+import edu.yu.cs.com1320.project.impl.TrieImpl;
 import edu.yu.cs.com1320.project.stage3.Document;
 import edu.yu.cs.com1320.project.stage3.DocumentStore;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class DocumentStoreImpl implements DocumentStore {
@@ -17,6 +22,7 @@ public class DocumentStoreImpl implements DocumentStore {
     private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
     private HashTableImpl<URI, StackImpl> deletedDocsHT = new HashTableImpl<>();
     private HashTableImpl<URI, StackImpl> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
+    private TrieImpl<Document> trie = new TrieImpl<>();
 
     /**
      * @param input the document being put
@@ -36,6 +42,13 @@ public class DocumentStoreImpl implements DocumentStore {
         if (input == null) {
             docReturn = (DocumentImpl)hashTable.put(uri, null);
             this.deleteFromPut(uri, docReturn);
+            if(docReturn != null){
+                //new stuff for stage 3
+                Set<String> words = docReturn.getWords();
+                for(String w : words){
+                    trie.delete(w, docReturn);
+                }
+            }
             return docReturn == null ? 0 : docReturn.hashCode();
         }
         //Second piece is an add
@@ -48,6 +61,11 @@ public class DocumentStoreImpl implements DocumentStore {
             doc = new DocumentImpl(uri, bD);
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
+        //new stuff for stage 3
+        Set<String> words = docReturn.getWords();
+        for(String w : words){
+            trie.put(w, docReturn);
+        }
         return this.putFromPut(uri,docReturn);
     }
 
@@ -209,23 +227,60 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
 
+
     @Override
     public List<Document> search(String keyword) {
-        return null;
+        Comparator<Document> documentComparator = new Comparator<Document>( ) {
+            @Override
+            public int compare(Document d1, Document d2) {
+                if(d1.wordCount(keyword)> d2.wordCount(keyword)){
+                    return 1;
+                }
+                if(d1.wordCount(keyword)< d2.wordCount(keyword)){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }
+        };
+        return trie.getAllSorted(keyword,documentComparator); //Forgot how to make comparator
     }
 
     @Override
     public List<Document> searchByPrefix(String keywordPrefix) {
-        return null;
+        Comparator<Document> documentComparator = new Comparator<Document>( ) {
+            @Override
+            public int compare(Document d1, Document d2) {
+                if(d1.wordCount(keywordPrefix)> d2.wordCount(keywordPrefix)){
+                    return 1;
+                }
+                if(d1.wordCount(keywordPrefix)< d2.wordCount(keywordPrefix)){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }
+        };
+        return trie.getAllWithPrefixSorted(keywordPrefix, documentComparator);
     }
 
     @Override
     public Set<URI> deleteAll(String keyword) {
-        return null;
+        Set<Document> deletedDocs = trie.deleteAll(keyword);
+        Set<URI> uris = new HashSet<>();
+        for(Document d : deletedDocs){
+            uris.add(d.getKey());
+        }
+        return uris;
     }
 
     @Override
     public Set<URI> deleteAllWithPrefix(String keywordPrefix) {
-        return null;
+        Set<Document> deletedDocs = trie.deleteAllWithPrefix(keywordPrefix);
+        Set<URI> uris = new HashSet<>();
+        for(Document d : deletedDocs){
+            uris.add(d.getKey());
+        }
+        return uris;
     }
 }
