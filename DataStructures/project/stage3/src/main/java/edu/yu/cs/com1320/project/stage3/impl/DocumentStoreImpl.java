@@ -2,6 +2,8 @@ package edu.yu.cs.com1320.project.stage3.impl;
 
 
 import edu.yu.cs.com1320.project.CommandSet;
+import edu.yu.cs.com1320.project.GenericCommand;
+import edu.yu.cs.com1320.project.Undoable;
 import edu.yu.cs.com1320.project.impl.HashTableImpl;
 import edu.yu.cs.com1320.project.impl.StackImpl;
 import edu.yu.cs.com1320.project.impl.TrieImpl;
@@ -11,14 +13,11 @@ import edu.yu.cs.com1320.project.stage3.DocumentStore;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class DocumentStoreImpl implements DocumentStore {
-    private StackImpl commandStack = new StackImpl();
+    private StackImpl<Undoable> commandStack = new StackImpl<>();
     private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
     private HashTableImpl<URI, StackImpl> deletedDocsHT = new HashTableImpl<>();
     private HashTableImpl<URI, StackImpl> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
@@ -42,13 +41,6 @@ public class DocumentStoreImpl implements DocumentStore {
         if (input == null) {
             docReturn = (DocumentImpl)hashTable.put(uri, null);
             this.deleteFromPut(uri, docReturn);
-            if(docReturn != null){
-                //new stuff for stage 3
-                Set<String> words = docReturn.getWords();
-                for(String w : words){
-                    trie.delete(w, docReturn);
-                }
-            }
             return docReturn == null ? 0 : docReturn.hashCode();
         }
         //Second piece is an add
@@ -61,11 +53,19 @@ public class DocumentStoreImpl implements DocumentStore {
             doc = new DocumentImpl(uri, bD);
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
+
         //new stuff for stage 3
-        Set<String> words = docReturn.getWords();
-        for(String w : words){
-            trie.put(w, docReturn);
+        Set<String> words = doc.getWords();
+        for (String w : words) {
+            trie.put(w, doc);
         }
+        if(docReturn != null){
+            Set<String> deletedWords = docReturn.getWords();
+            for (String w : deletedWords) {
+                trie.delete(w, docReturn);
+            }
+        }
+
         return this.putFromPut(uri,docReturn);
     }
 
@@ -74,7 +74,7 @@ public class DocumentStoreImpl implements DocumentStore {
         if(docReturn == null) {
             //These next few lines are need for undo purposes
             Function<URI,Boolean> undoPutFunction = uri1 -> this.undoPutDocument(uri1);
-            commandStack.push(new Command(uri, undoPutFunction));
+            commandStack.push(new GenericCommand<>(uri, undoPutFunction));
             //These previous few lines are need for undo purposes
             return 0;
         }else{
@@ -85,13 +85,21 @@ public class DocumentStoreImpl implements DocumentStore {
             StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
             stack.push(docReturn);//Remember this can be null
             Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
-            commandStack.push(new Command(uri, undoReplaceFunction));
+            commandStack.push(new GenericCommand<>(uri, undoReplaceFunction));
             return docReturn.hashCode();
         }
     }
 
     //Whole purpose is to make put method shorter
     private void deleteFromPut(URI uri,DocumentImpl docReturn){
+        //new stuff for stage 3
+        if(docReturn != null){
+            Set<String> words = docReturn.getWords();
+            for(String w : words){
+                trie.delete(w, docReturn);
+            }
+        }
+        //stage 2 stuff
         //These next few lines are need for undo purposes
         if(!(deletedDocsHT.get(uri) instanceof StackImpl)){
             StackImpl<DocumentImpl> newStack = new StackImpl<>();
@@ -100,7 +108,7 @@ public class DocumentStoreImpl implements DocumentStore {
         StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
         stack.push(docReturn);//Remember this can be null
         Function<URI,Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
-        commandStack.push(new Command(uri, undoDeleteFunction));
+        commandStack.push(new GenericCommand<>(uri, undoDeleteFunction));
         //These previous few lines are need for undo purposes
     }
 
@@ -146,6 +154,14 @@ public class DocumentStoreImpl implements DocumentStore {
             throw new IllegalArgumentException("Tried to delete a null URI");
         }
         DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
+        //new stuff for stage 3
+        if(doc != null){
+            Set<String> words = doc.getWords();
+            for(String w : words){
+                trie.delete(w, doc);
+            }
+        }
+        //Stage 2 stuff
         //These next few lines are all needed for undo purposes
         if(deletedDocsHT.get(uri) == null){
             StackImpl<DocumentImpl> newStack = new StackImpl<>();
@@ -155,7 +171,7 @@ public class DocumentStoreImpl implements DocumentStore {
 
         stack.push(doc);//Remember this can be null
         Function<URI,Boolean> undoDeleteFunction= uri1 -> this.undoDeleteDocument(uri1);
-        commandStack.push(new Command(uri, undoDeleteFunction));
+        commandStack.push(new GenericCommand<>(uri, undoDeleteFunction));
         //Previous lines were needed for undo purposes
         if(doc == null){
             return false;
@@ -170,6 +186,11 @@ public class DocumentStoreImpl implements DocumentStore {
         }
         DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
         hashTable.put(uri1, doc);
+        //new stuff for stage 3
+        Set<String> words = doc.getWords();
+        for (String w : words) {
+            trie.put(w, doc);
+        }
         return true;
     }
 
@@ -182,7 +203,7 @@ public class DocumentStoreImpl implements DocumentStore {
 
         if(commandStack.size()>0){
 
-            Command undoCommand = (Command) commandStack.pop();
+            Undoable undoCommand = (Undoable) commandStack.pop();
 
             undoCommand.undo();
 
@@ -205,24 +226,26 @@ public class DocumentStoreImpl implements DocumentStore {
         Boolean haventFoundURI = true;
         StackImpl holderStack = new StackImpl();
         while(haventFoundURI){
-            if(commandStack.size()>0){
-                Command currentCommand = (Command) commandStack.pop();
-                if(currentCommand.getUri() == uri){
-                    currentCommand.undo();
-                    haventFoundURI = false;
+            if(commandStack.size()>0) {
+                Undoable currentCommand = (Undoable) commandStack.pop();
+                if (currentCommand instanceof GenericCommand) {
+                    if (((GenericCommand)currentCommand).getTarget() == uri) {
+                        currentCommand.undo();
+                        haventFoundURI = false;
+                    }
+                    if (haventFoundURI == true) {
+                        holderStack.push(currentCommand);
+                    }
+                } else {
+                    while (holderStack.size() > 0) {
+                        commandStack.push((Undoable) holderStack.pop());
+                    }
+                    throw new IllegalStateException("there are no actions on the command stack for the given URI");
                 }
-                if(haventFoundURI == true) {
-                    holderStack.push(currentCommand);
-                }
-            }else{
-                while (holderStack.size()>0){
-                    commandStack.push(holderStack.pop());
-                }
-                throw new IllegalStateException("there are no actions on the command stack for the given URI");
             }
         }
         while (holderStack.size()>0){
-            commandStack.push(holderStack.pop());
+            commandStack.push((Undoable) holderStack.pop());
         }
     }
 
