@@ -85,17 +85,19 @@ public class DocumentImpl implements Document {
     private void addWordsToHtAndSet(String txt){
 
         //removing anything that's not txt or string
-        txt.replaceAll("[^a-zA-Z0-9\\s]", "");
+        txt = txt.replaceAll("[^a-zA-Z0-9\\s]", "");
         //this makes it case insensitive
-        txt.toLowerCase();
+        txt = txt.toLowerCase();
         //this gets the individual words
         String[] words = txt.split(" ");
-        this.words.addAll(Arrays.asList(words));
         for(int i = 0; i < words.length; i++){
-            if(wordCount.get(words[i]) == null){
-                wordCount.put(words[i], 1);
-            }else {
-                wordCount.put(words[i],wordCount.get(words[i])+1);
+            if(!(words[i].equals(""))) {
+                this.words.add(words[i]);
+                if (wordCount.get(words[i]) == null) {
+                    wordCount.put(words[i], 1);
+                } else {
+                    wordCount.put(words[i], wordCount.get(words[i]) + 1);
+                }
             }
         }
     }
@@ -156,7 +158,10 @@ public class DocumentImpl implements Document {
 
     @Override
     public int wordCount(String word) {
-        return wordCount.get(word) == null ? 0 : wordCount.get(word);
+        String lowerCaseWord = word.toLowerCase();
+        System.out.println(wordCount.get(lowerCaseWord));
+        lowerCaseWord = lowerCaseWord.replaceAll("[^a-zA-Z0-9\\s]", "");
+        return wordCount.get(lowerCaseWord) == null ? 0 : (Integer)wordCount.get(lowerCaseWord);
 
     }
 

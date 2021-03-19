@@ -57,11 +57,13 @@ public class DocumentStoreImpl implements DocumentStore {
         //new stuff for stage 3
         Set<String> words = doc.getWords();
         for (String w : words) {
+            w = w.replaceAll("[^a-zA-Z0-9\\s]", "");
             trie.put(w, doc);
         }
         if(docReturn != null){
             Set<String> deletedWords = docReturn.getWords();
             for (String w : deletedWords) {
+                w = w.replaceAll("[^a-zA-Z0-9\\s]", "");
                 trie.delete(w, docReturn);
             }
         }
@@ -118,7 +120,20 @@ public class DocumentStoreImpl implements DocumentStore {
         if(uri1 == null){
             throw new IllegalArgumentException("Tried to undo a null URI");
         }
-        hashTable.put(uri1, (DocumentImpl) (replacedDocsHT.get(uri1).pop()));
+        DocumentImpl docThatWASreplaced = (DocumentImpl) replacedDocsHT.get(uri1).pop();  //This is the doc that was replaced that were putting back
+        DocumentImpl docThatReplaced = (DocumentImpl) hashTable.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
+        if(docThatReplaced != null) {
+            Set<String> words = docThatReplaced.getWords();
+            for (String w : words) {
+                trie.delete(w, docThatReplaced);
+            }
+        }
+        if(docThatWASreplaced != null) {
+            Set<String> words = docThatWASreplaced.getWords();
+            for (String w : words) {
+                trie.put(w, docThatWASreplaced);
+            }
+        }
         return true;
     }
 
@@ -126,8 +141,16 @@ public class DocumentStoreImpl implements DocumentStore {
         if(uri1 == null){
             throw new IllegalArgumentException("Tried to undo a null URI");
         }
-        if(hashTable.put(uri1, null) == null){
+        Document doc = hashTable.put(uri1, null);
+        if(doc == null){
             return false;
+        }
+        //new stuff for stage 3
+        if(doc != null) {
+            Set<String> words = doc.getWords();
+            for (String w : words) {
+                trie.delete(w, doc);
+            }
         }
         return true;
     }
@@ -187,9 +210,12 @@ public class DocumentStoreImpl implements DocumentStore {
         DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
         hashTable.put(uri1, doc);
         //new stuff for stage 3
-        Set<String> words = doc.getWords();
-        for (String w : words) {
-            trie.put(w, doc);
+        if(doc != null) {
+            Set<String> words = doc.getWords();
+            for (String w : words) {
+
+                trie.put(w, doc);
+            }
         }
         return true;
     }
@@ -228,20 +254,28 @@ public class DocumentStoreImpl implements DocumentStore {
         while(haventFoundURI){
             if(commandStack.size()>0) {
                 Undoable currentCommand = (Undoable) commandStack.pop();
-                if (currentCommand instanceof GenericCommand) {
-                    if (((GenericCommand)currentCommand).getTarget() == uri) {
+                if(currentCommand instanceof GenericCommand) {
+                    if (((GenericCommand) currentCommand).getTarget() == uri) {
                         currentCommand.undo();
                         haventFoundURI = false;
                     }
                     if (haventFoundURI == true) {
                         holderStack.push(currentCommand);
                     }
-                } else {
-                    while (holderStack.size() > 0) {
-                        commandStack.push((Undoable) holderStack.pop());
+                }else{
+                    if(((CommandSet) currentCommand).containsTarget(uri)){
+                        ((CommandSet) currentCommand).undo(uri);
+                        haventFoundURI = false;
                     }
-                    throw new IllegalStateException("there are no actions on the command stack for the given URI");
+                    if (((CommandSet) currentCommand).size() != 0) {
+                        holderStack.push(currentCommand);
+                    }
                 }
+            }else {
+                while (holderStack.size() > 0) {
+                    commandStack.push((Undoable) holderStack.pop());
+                }
+                throw new IllegalStateException("there are no actions on the command stack for the given URI");
             }
         }
         while (holderStack.size()>0){
@@ -251,8 +285,10 @@ public class DocumentStoreImpl implements DocumentStore {
 
 
 
+
     @Override
     public List<Document> search(String keyword) {
+        keyword.toLowerCase();
         Comparator<Document> documentComparator = new Comparator<Document>( ) {
             @Override
             public int compare(Document d1, Document d2) {
@@ -271,6 +307,7 @@ public class DocumentStoreImpl implements DocumentStore {
 
     @Override
     public List<Document> searchByPrefix(String keywordPrefix) {
+        keywordPrefix.toLowerCase();
         Comparator<Document> documentComparator = new Comparator<Document>( ) {
             @Override
             public int compare(Document d1, Document d2) {
@@ -289,20 +326,54 @@ public class DocumentStoreImpl implements DocumentStore {
 
     @Override
     public Set<URI> deleteAll(String keyword) {
+        keyword = keyword.toLowerCase();
         Set<Document> deletedDocs = trie.deleteAll(keyword);
+        CommandSet<URI> undoDelAllComands = new CommandSet<>();
         Set<URI> uris = new HashSet<>();
+        Boolean areThereAnyDocs = false;
         for(Document d : deletedDocs){
+            hashTable.put(d.getKey(),null);
             uris.add(d.getKey());
+            //These next few lines are need for undo purposes
+            if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
+                StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                deletedDocsHT.put(d.getKey(), newStack);
+            }
+            StackImpl<DocumentImpl> stack = deletedDocsHT.get(d.getKey());
+            stack.push((DocumentImpl) d);
+            Function<URI, Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
+            undoDelAllComands.addCommand(new GenericCommand<>(d.getKey(), undoDeleteFunction));
+            areThereAnyDocs = true;
+        }
+        if(areThereAnyDocs = true) {//have to fix this still
+            commandStack.push(undoDelAllComands);
         }
         return uris;
     }
 
     @Override
     public Set<URI> deleteAllWithPrefix(String keywordPrefix) {
+        keywordPrefix.toLowerCase();
         Set<Document> deletedDocs = trie.deleteAllWithPrefix(keywordPrefix);
+        CommandSet<URI> undoDelAllPreCommands = new CommandSet<>();
         Set<URI> uris = new HashSet<>();
+        Boolean areThereAnyDocs = false;
         for(Document d : deletedDocs){
+            hashTable.put(d.getKey(),null);
             uris.add(d.getKey());
+            //These next few lines are need for undo purposes
+            if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
+                StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                deletedDocsHT.put(d.getKey(), newStack);
+            }
+            StackImpl<DocumentImpl> stack = deletedDocsHT.get(d.getKey());
+            stack.push((DocumentImpl) d);
+            Function<URI, Boolean> undoDeleteFunction = uri1 -> this.undoDeleteDocument(uri1);
+            undoDelAllPreCommands.addCommand(new GenericCommand<>(d.getKey(), undoDeleteFunction));
+            areThereAnyDocs = true;
+        }
+        if(areThereAnyDocs = true) {//have to fix this still
+            commandStack.push(undoDelAllPreCommands);
         }
         return uris;
     }

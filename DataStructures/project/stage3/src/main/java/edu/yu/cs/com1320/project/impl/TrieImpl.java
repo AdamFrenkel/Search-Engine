@@ -14,11 +14,12 @@ public class TrieImpl<Value> implements Trie<Value> {
 
 
     private class Node<Value> {
-        Set<Value> val = null;
+        Set<Value> val = new HashSet<>();
         TrieImpl.Node[] links = new TrieImpl.Node[alphabetSize];
         private Set<Value> getVal(){
             return val;
         }
+        int amtOfVals = 0;
     }
 
 
@@ -49,12 +50,13 @@ public class TrieImpl<Value> implements Trie<Value> {
     {
         //create a new node
         if (x == null) {
-            x = new Node();
+            x = new Node<Value>();
         }
 
         //we've reached the last node in the key,
         //set the value for the key and return the node
         if (d == key.length()) {
+            x.amtOfVals++;
             x.val.add(val);
             return x;
         }
@@ -77,11 +79,11 @@ public class TrieImpl<Value> implements Trie<Value> {
         Node currentNode = root;
         for(int i = 0; i<key.length(); i++){
             if(currentNode.links[Character.toLowerCase(key.charAt(i))] == null){
-                return null;
+                return new ArrayList<>();
             }
             currentNode = currentNode.links[Character.toLowerCase(key.charAt(i))];
         }
-        if(currentNode.val == null){
+        if(currentNode.val.size() == 0){
             return new ArrayList<>();
         }
         List<Value> values = new ArrayList<>();
@@ -102,18 +104,19 @@ public class TrieImpl<Value> implements Trie<Value> {
         Node currentNode = root;
         for(int i = 0; i<prefix.length(); i++){
             if(currentNode.links[Character.toLowerCase(prefix.charAt(i))] == null){
-                return null;
+                return new ArrayList<>();
             }
             currentNode = currentNode.links[Character.toLowerCase(prefix.charAt(i))];
         }
         this.getAllWithPrefix(currentNode);
-        prefixes.sort(comparator);
-        List<Value> returnPrefixes = prefixes;
-        prefixes = new ArrayList<Value>();
-        return returnPrefixes;
+        List<Value> prefixList = new ArrayList<>();
+        prefixList.addAll(prefixes);
+        prefixList.sort(comparator);
+        prefixes = new HashSet<>();
+        return prefixList;
     }
 
-    private List<Value> prefixes = new ArrayList<Value>();
+    private Set<Value> prefixes = new HashSet<>();
     private void getAllWithPrefix(Node x){
         for(int i = 0; i < x.links.length; i++){
             if(x.links[i] != null){
@@ -121,6 +124,7 @@ public class TrieImpl<Value> implements Trie<Value> {
             }
         }
         if(x.val != null){
+
             prefixes.addAll(x.val);
         }
     }
@@ -135,13 +139,13 @@ public class TrieImpl<Value> implements Trie<Value> {
         Node previousNode = null;
         for(int i = 0; i<prefix.length(); i++){
             if(currentNode.links[Character.toLowerCase(prefix.charAt(i))] == null){
-                return null;
+                return new HashSet<>();
             }
             previousNode = currentNode;
             currentNode = currentNode.links[Character.toLowerCase(prefix.charAt(i))];
         }
         this.deleteAllWithPrefix(currentNode);
-        previousNode.links[Character.toLowerCase(prefix.charAt(prefix.length()))] = null;
+        previousNode.links[Character.toLowerCase(prefix.charAt(prefix.length()-1))] = null;
         Set<Value> returnSet = new HashSet<>();
         returnSet.addAll(deletedSet3);
         deletedSet3 = new HashSet<>();
@@ -157,7 +161,7 @@ public class TrieImpl<Value> implements Trie<Value> {
         }
         if(x.val != null){
             deletedSet3.addAll(x.val);
-            x.val = null;
+            x.val = new HashSet<Value>();
         }
     }
 
@@ -167,6 +171,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a Set of all Values that were deleted.
      */
     public Set<Value> deleteAll(String key){
+        key.toLowerCase();
         this.root = deleteAll(this.root, key, 0); //I have no idea why we're setting the root = to this node
         Set<Value> set = new HashSet<>();
         set.addAll(deletedSet);
@@ -183,7 +188,8 @@ public class TrieImpl<Value> implements Trie<Value> {
         //we're at the node to del - set the val to null
         if (d == key.length()) {
             deletedSet.addAll(x.getVal());
-            x.val = null;
+            x.amtOfVals--;
+            x.val = new HashSet<Value>();
         }
         //continue down the trie to the target node
         else {
@@ -191,7 +197,7 @@ public class TrieImpl<Value> implements Trie<Value> {
             x.links[c] = this.deleteAll(x.links[c], key, d + 1);
         }
         //this node has a val – do nothing, return the node
-        if (x.val != null) {
+        if (x.amtOfVals > 0) {
             return x;
         }
         //remove subtrie rooted at x if it is completely empty
@@ -229,20 +235,27 @@ public class TrieImpl<Value> implements Trie<Value> {
         //we're at the node to del - set the val to null
         if (d == key.length()) {
             deletedSet2 = x.getVal();
+            boolean haventFoundVal = true;
             for(Value v : deletedSet2){
                 if(v == val){
+                    x.amtOfVals--;
                     deletedValue = v;
-                    v = null;
+                    x.val.remove(v);
+                    haventFoundVal = false;
+                    //v = null;
                 }
+            if(haventFoundVal == false){
+                break;
+            }
             }
         }
         //continue down the trie to the target node
         else {
             char c = key.charAt(d);
-            x.links[c] = this.deleteAll(x.links[c], key, d + 1);
+            x.links[c] = this.delete(x.links[c], key, d + 1,val); //was deleteAll
         }
         //this node has a val – do nothing, return the node
-        if (x.val != null) {
+        if (x.val.size() >0) {
             return x;
         }
         //remove subtrie rooted at x if it is completely empty

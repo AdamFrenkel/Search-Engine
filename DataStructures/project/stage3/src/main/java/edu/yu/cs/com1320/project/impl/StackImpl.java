@@ -25,6 +25,9 @@ public class StackImpl<T> implements Stack<T> {
      */
     @Override
     public T pop(){
+        if (stackSize == 0) {
+            return null;
+        }
         T returnT = (T) linkedList.removeFirst();
         this.stackSize--;
         return returnT;
@@ -36,6 +39,9 @@ public class StackImpl<T> implements Stack<T> {
      */
     @Override
     public T peek(){
+        if (stackSize == 0) {
+            return null;
+        }
         return (T) linkedList.getFirst();
     }
 
