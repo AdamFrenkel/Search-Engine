@@ -110,7 +110,6 @@ public class DocumentStoreImplTest {
             DocumentImpl doc2 = new DocumentImpl(this.uri2, this.txt2);
             DocumentImpl doc3 = new DocumentImpl(this.uri3, this.txt3);
             for (char c = 'a'; c<='z'; c++) {
-                System.out.println(c);
                 List<Document> list = store.searchByPrefix(Character.toString(c));
                 if (list.size()!=0) {
                     assertNotEquals(doc3, list.get(0));
@@ -1665,7 +1664,6 @@ public class DocumentStoreImplTest {
         }
         for (int i = 0; i < 21; i++) {
             try {
-                System.out.println(i);
                 documentStore.putDocument(new ByteArrayInputStream(stringArray[i].getBytes()), uriArray[i], DocumentStore.DocumentFormat.BINARY);
             } catch (java.io.IOException e) {
                 fail();

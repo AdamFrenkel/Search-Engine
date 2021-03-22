@@ -112,11 +112,11 @@ public class TrieImpl<Value> implements Trie<Value> {
         List<Value> prefixList = new ArrayList<>();
         prefixList.addAll(prefixes);
         prefixList.sort(comparator);
-        prefixes = new HashSet<>();
+        prefixes = new ArrayList<>();
         return prefixList;
     }
 
-    private Set<Value> prefixes = new HashSet<>();
+    private List<Value> prefixes = new ArrayList<>();
     private void getAllWithPrefix(Node x){
         for(int i = 0; i < x.links.length; i++){
             if(x.links[i] != null){
@@ -124,8 +124,12 @@ public class TrieImpl<Value> implements Trie<Value> {
             }
         }
         if(x.val != null){
-
-            prefixes.addAll(x.val);
+            Set<Value> setofVals = x.val;
+            for (Value v : setofVals){
+                if(!prefixes.contains(v)){
+                    prefixes.add(v);
+                }
+            }
         }
     }
     /**

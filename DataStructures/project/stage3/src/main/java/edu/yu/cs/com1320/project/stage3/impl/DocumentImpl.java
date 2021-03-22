@@ -159,7 +159,6 @@ public class DocumentImpl implements Document {
     @Override
     public int wordCount(String word) {
         String lowerCaseWord = word.toLowerCase();
-        System.out.println(wordCount.get(lowerCaseWord));
         lowerCaseWord = lowerCaseWord.replaceAll("[^a-zA-Z0-9\\s]", "");
         return wordCount.get(lowerCaseWord) == null ? 0 : (Integer)wordCount.get(lowerCaseWord);
 

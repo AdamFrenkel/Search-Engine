@@ -292,10 +292,10 @@ public class DocumentStoreImpl implements DocumentStore {
         Comparator<Document> documentComparator = new Comparator<Document>( ) {
             @Override
             public int compare(Document d1, Document d2) {
-                if(d1.wordCount(keyword)> d2.wordCount(keyword)){
+                if(d1.wordCount(keyword)< d2.wordCount(keyword)){
                     return 1;
                 }
-                if(d1.wordCount(keyword)< d2.wordCount(keyword)){
+                if(d1.wordCount(keyword)> d2.wordCount(keyword)){
                     return -1;
                 }else{
                     return 0;
@@ -311,10 +311,10 @@ public class DocumentStoreImpl implements DocumentStore {
         Comparator<Document> documentComparator = new Comparator<Document>( ) {
             @Override
             public int compare(Document d1, Document d2) {
-                if(d1.wordCount(keywordPrefix)> d2.wordCount(keywordPrefix)){
+                if(d1.wordCount(keywordPrefix)< d2.wordCount(keywordPrefix)){
                     return 1;
                 }
-                if(d1.wordCount(keywordPrefix)< d2.wordCount(keywordPrefix)){
+                if(d1.wordCount(keywordPrefix)> d2.wordCount(keywordPrefix)){
                     return -1;
                 }else{
                     return 0;
