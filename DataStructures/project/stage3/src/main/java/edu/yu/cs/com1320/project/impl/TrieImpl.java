@@ -48,6 +48,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      */
     private Node put(Node x, String key, Value val, int d)
     {
+        key = key.toLowerCase();
         //create a new node
         if (x == null) {
             x = new Node<Value>();
@@ -76,6 +77,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a List of matching Values, in descending order
      */
     public List<Value> getAllSorted(String key, Comparator<Value> comparator){
+        key = key.toLowerCase();
         Node currentNode = root;
         for(int i = 0; i<key.length(); i++){
             if(currentNode.links[Character.toLowerCase(key.charAt(i))] == null){
@@ -101,6 +103,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a List of all matching Values containing the given prefix, in descending order
      */
     public List<Value> getAllWithPrefixSorted(String prefix, Comparator<Value> comparator){
+        prefix = prefix.toLowerCase();
         Node currentNode = root;
         for(int i = 0; i<prefix.length(); i++){
             if(currentNode.links[Character.toLowerCase(prefix.charAt(i))] == null){
@@ -139,6 +142,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a Set of all Values that were deleted.
      */
     public Set<Value> deleteAllWithPrefix(String prefix){
+        prefix = prefix.toLowerCase();
         Node currentNode = root;
         Node previousNode = null;
         for(int i = 0; i<prefix.length(); i++){
@@ -175,7 +179,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a Set of all Values that were deleted.
      */
     public Set<Value> deleteAll(String key){
-        key.toLowerCase();
+        key = key.toLowerCase();
         this.root = deleteAll(this.root, key, 0); //I have no idea why we're setting the root = to this node
         Set<Value> set = new HashSet<>();
         set.addAll(deletedSet);
@@ -223,6 +227,7 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return the value which was deleted. If the key did not contain the given value, return null.
      */
     public Value delete(String key, Value val){
+        key = key.toLowerCase();
         this.root = delete(this.root, key, 0, val);
         deletedSet2 = null;
         Value returnVal = deletedValue;
@@ -241,16 +246,16 @@ public class TrieImpl<Value> implements Trie<Value> {
             deletedSet2 = x.getVal();
             boolean haventFoundVal = true;
             for(Value v : deletedSet2){
-                if(v == val){
+                if (v.equals(val)) {
                     x.amtOfVals--;
                     deletedValue = v;
                     x.val.remove(v);
                     haventFoundVal = false;
                     //v = null;
                 }
-            if(haventFoundVal == false){
-                break;
-            }
+                if(haventFoundVal == false) {
+                    break;
+                }
             }
         }
         //continue down the trie to the target node
