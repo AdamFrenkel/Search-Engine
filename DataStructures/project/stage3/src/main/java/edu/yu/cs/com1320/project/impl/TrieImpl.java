@@ -29,11 +29,12 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @param val
      */
     public void put(String key, Value val){
+        if( key == null){
+            throw new IllegalArgumentException("null in trie");
+        }
         //Making lowercase so that the whole tree can be case insensitive
         String lowerCaseKey = key.toLowerCase();
-        if (val == null) {  //deleteAll the value from this key
-            this.deleteAll(lowerCaseKey);
-        } else {
+        if (val != null) {
             this.root = put(this.root, lowerCaseKey, val, 0);
         }
     }
@@ -77,11 +78,14 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a List of matching Values, in descending order
      */
     public List<Value> getAllSorted(String key, Comparator<Value> comparator){
+        if( key == null || comparator == null){
+            throw new IllegalArgumentException("null in trie");
+        }
         key = key.toLowerCase();
         Node currentNode = root;
         for(int i = 0; i<key.length(); i++){
             if(currentNode.links[Character.toLowerCase(key.charAt(i))] == null){
-                return new ArrayList<>();
+                return new ArrayList<Value>();
             }
             currentNode = currentNode.links[Character.toLowerCase(key.charAt(i))];
         }
@@ -103,6 +107,12 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a List of all matching Values containing the given prefix, in descending order
      */
     public List<Value> getAllWithPrefixSorted(String prefix, Comparator<Value> comparator){
+        if( prefix == null || comparator == null){
+            throw new IllegalArgumentException("null in trie");
+        }
+        if (prefix == ""){
+            return new ArrayList<>();
+        }
         prefix = prefix.toLowerCase();
         Node currentNode = root;
         for(int i = 0; i<prefix.length(); i++){
@@ -142,6 +152,12 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a Set of all Values that were deleted.
      */
     public Set<Value> deleteAllWithPrefix(String prefix){
+        if( prefix == null){
+            throw new IllegalArgumentException("null in trie");
+        }
+        if(prefix == ""){
+            return new HashSet<>();
+        }
         prefix = prefix.toLowerCase();
         Node currentNode = root;
         Node previousNode = null;
@@ -179,6 +195,9 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return a Set of all Values that were deleted.
      */
     public Set<Value> deleteAll(String key){
+        if(key == null){
+            throw new IllegalArgumentException("null in trie");
+        }
         key = key.toLowerCase();
         this.root = deleteAll(this.root, key, 0); //I have no idea why we're setting the root = to this node
         Set<Value> set = new HashSet<>();
@@ -196,7 +215,7 @@ public class TrieImpl<Value> implements Trie<Value> {
         //we're at the node to del - set the val to null
         if (d == key.length()) {
             deletedSet.addAll(x.getVal());
-            x.amtOfVals--;
+            x.amtOfVals = 0;
             x.val = new HashSet<Value>();
         }
         //continue down the trie to the target node
@@ -227,6 +246,9 @@ public class TrieImpl<Value> implements Trie<Value> {
      * @return the value which was deleted. If the key did not contain the given value, return null.
      */
     public Value delete(String key, Value val){
+        if(key == null || val == null){
+            throw new IllegalArgumentException("null in trie");
+        }
         key = key.toLowerCase();
         this.root = delete(this.root, key, 0, val);
         deletedSet2 = null;
