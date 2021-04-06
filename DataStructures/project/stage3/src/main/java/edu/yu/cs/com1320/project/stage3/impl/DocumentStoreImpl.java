@@ -53,8 +53,12 @@ public class DocumentStoreImpl implements DocumentStore {
             doc = new DocumentImpl(uri, bD);
         }
         docReturn = (DocumentImpl)hashTable.put(uri, doc);
-
         //new stuff for stage 3
+        putStage3(doc, docReturn);
+
+        return this.putFromPut(uri,docReturn);
+    }
+    private void putStage3(Document doc, Document docReturn){
         Set<String> words = doc.getWords();
         for (String w : words) {
             w = w.replaceAll("[^a-zA-Z0-9\\s]", "");
@@ -67,10 +71,7 @@ public class DocumentStoreImpl implements DocumentStore {
                 trie.delete(w, docReturn);
             }
         }
-
-        return this.putFromPut(uri,docReturn);
     }
-
     //Whole purpose is to make put method shorter
     private int putFromPut(URI uri,DocumentImpl docReturn){
         if(docReturn == null) {
