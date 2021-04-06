@@ -307,21 +307,35 @@ public class DocumentStoreImpl implements DocumentStore {
 
     @Override
     public List<Document> searchByPrefix(String keywordPrefix) {
-        keywordPrefix.toLowerCase();
+        String lowerCase = keywordPrefix.toLowerCase();
         Comparator<Document> documentComparator = new Comparator<Document>( ) {
             @Override
             public int compare(Document d1, Document d2) {
-                if(d1.wordCount(keywordPrefix)< d2.wordCount(keywordPrefix)){
-                    return 1;
+                int d1size = 0;
+                Set<String> d1Words = d1.getWords();
+                for(String w : d1Words){
+                    if(w.startsWith(lowerCase)){
+                        d1size+= d1.wordCount(w);
+                    }
                 }
-                if(d1.wordCount(keywordPrefix)> d2.wordCount(keywordPrefix)){
+                int d2size = 0;
+                Set<String> d2Words = d2.getWords();
+                for(String w : d2Words){
+                    if(w.startsWith(lowerCase)){
+                        d2size+= d2.wordCount(w);
+                    }
+                }
+                if(d1size> d2size){
                     return -1;
+                }
+                if(d1size< d2size){
+                    return 1;
                 }else{
                     return 0;
                 }
             }
         };
-        return trie.getAllWithPrefixSorted(keywordPrefix, documentComparator);
+        return trie.getAllWithPrefixSorted(lowerCase, documentComparator);
     }
 
     @Override
