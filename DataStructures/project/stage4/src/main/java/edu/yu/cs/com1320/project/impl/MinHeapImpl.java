@@ -2,6 +2,8 @@ package edu.yu.cs.com1320.project.impl; //hmmm... maybe in wrong spot
 
 import edu.yu.cs.com1320.project.MinHeap;
 
+import java.lang.reflect.Array;
+
 public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
 
     @Override
@@ -27,6 +29,10 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
 
     @Override
     protected void doubleArraySize() {
-
+        E[] elementsCopy = elements;
+        elements = (E[]) new Object[elements.length *2];
+        for(int i = 0; i<elementsCopy.length; i++){
+            elements[i] = elementsCopy[i];
+        }
     }
 }
