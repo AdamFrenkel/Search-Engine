@@ -48,6 +48,51 @@ public class DocumentStoreImplTest {
     }
     private String txt6 = "Penguin Park Piccalo Pants Pain Possum and I'm here to STAY! awawawawawawawawawawawawawawawawawawawawawawaewaeaeaeaesrewarewsewrarewarewserwsercrcxvftvhgdbkjdbnwucbnuhfruynbwxuyfizwmbwfyxnuybnregh byugcnbgyxfrebygxbfrmuyzbvuybmfrbubfvubvexuybmzybmfubvmugbxmnxuvbrvnubnruzbuxyrewyhrfmuyzhbnuycbyftxbjnuynbxchgwybnxnbergrhghyrhxfytreuhxyhuxgccyhuebcgyhbwbfgyhegfddyhfgyehdfgyehbfgdhefdgyehedfgdhbvgyhbggyhbgvyhdbfgyhuefcgyhubfgeyehudxcgyhxucnhyunbxcghnbcbghjbcghbcghcfghbcghbcbghnbcgbhbcghnbcfghnbcfghbfcghnbcfghbcfghbghbcfghbgcfgdhbcf";
     @Test
+    public void testThatProperlyManageStorageWithUndo() throws IOException {
+        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+        System.out.println("txt4 bytes = " + txt4.getBytes().length);
+        System.out.println("txt5 bytes = " + txt5.getBytes().length);
+        System.out.println("txt6 bytes = " + txt6.getBytes().length);
+        DocumentStore store = new DocumentStoreImpl();
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()),this.uri5, DocumentStore.DocumentFormat.TXT);
+        store.undo(uri2);
+        store.setMaxDocumentCount(2);
+        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()),this.uri6, DocumentStore.DocumentFormat.TXT);
+        assertNull(store.getDocument(uri1));
+        assertEquals(txt2,store.getDocument(uri2).getDocumentTxt());
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri5));
+        assertNotNull(store.getDocument(uri6));
+        store.deleteDocument(uri2);
+        store.getDocument(uri6);
+        store.undo(uri2);
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(store.getDocument(uri1));
+        assertEquals(txt2,store.getDocument(uri2).getDocumentTxt());
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri5));
+        assertNull(store.getDocument(uri6));
+        store.setMaxDocumentBytes(126);
+        store.setMaxDocumentCount(4);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+        store.deleteAll("pizza"); //1 and 2, but not 4
+        store.getDocument(uri4);
+        store.undo();
+        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()),this.uri5, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(store.getDocument(uri1));
+        assertNotNull(store.getDocument(uri2));
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri4));
+        assertNotNull(store.getDocument(uri5));
+        assertNull(store.getDocument(uri6));
+    }
+    @Test
     public void testThatProperlyManageStorageAdvanced() throws IOException {
         System.out.println("txt1 bytes = " + txt1.getBytes().length);
         System.out.println("txt2 bytes = " + txt2.getBytes().length);
@@ -95,6 +140,7 @@ public class DocumentStoreImplTest {
         assertNull(store.getDocument(uri4));
         assertNull(store.getDocument(uri5));
         assertNull(store.getDocument(uri6));
+
 
 
 
