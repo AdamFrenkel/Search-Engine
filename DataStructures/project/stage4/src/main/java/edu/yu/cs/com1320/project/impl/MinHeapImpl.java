@@ -11,13 +11,27 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
     @Override
     public void reHeapify(E element) {
         int k = this.getArrayIndex(element);
-        if(this.isGreater(k/2,k)){
+        boolean isGreater;
+        if (elements[k/2] == null){
+            isGreater = false;
+        }else{
+            if (elements[k] == null){
+            isGreater = true;
+            }else{
+                isGreater = this.isGreater(k/2,k);
+            }
+        }
+        if(isGreater){
             upHeap(k);
         }
         else{
             if(2*k+1<= elements.length) {
-                if (this.isGreater(k, 2 * k) || this.isGreater(k, 2 * k + 1)) {
+                if(elements[2*k] == null ||elements[2*k+1] == null){
                     downHeap(k);
+                }else{
+                    if(this.isGreater(k, 2 * k) || this.isGreater(k, 2 * k + 1)) {
+                        downHeap(k);
+                    }
                 }
             }
         }
