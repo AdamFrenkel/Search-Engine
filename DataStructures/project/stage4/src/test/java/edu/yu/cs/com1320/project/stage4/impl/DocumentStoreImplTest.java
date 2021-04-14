@@ -87,6 +87,15 @@ public class DocumentStoreImplTest {
         assertNull(store.getDocument(uri4));
         assertNull(store.getDocument(uri5));
         assertNotNull(store.getDocument(uri6));
+        store.deleteAllWithPrefix("p");
+        store.deleteAllWithPrefix("t"); //interesting, only time that tested this method on a null trie, and actually had n error, so i fixed
+        assertNull(store.getDocument(uri1));
+        assertNull(store.getDocument(uri2));
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri4));
+        assertNull(store.getDocument(uri5));
+        assertNull(store.getDocument(uri6));
+
 
 
 //        assertEquals(0, store.searchByPrefix("x").size());
