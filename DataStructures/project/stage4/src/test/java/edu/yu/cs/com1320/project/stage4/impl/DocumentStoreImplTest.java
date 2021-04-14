@@ -20,7 +20,81 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DocumentStoreImplTest {
+
     //my Stage 4 Tests
+    //variables to hold possible values for doc1
+    private URI uri4;
+    { try {
+        uri4 = new URI("http://edu.yu.cs/com1320/project/doc4");
+    } catch (URISyntaxException e) {
+        e.printStackTrace(); }
+    }
+    //uri1 = new URI("http://edu.yu.cs/com1320/project/doc1");
+    private String txt4 = "This is the 4th doc, and it's here to stay!";
+    //variables to hold possible values for doc2
+    private URI uri5;
+    { try {
+        uri5 = new URI("http://edu.yu.cs/com1320/project/doc5");
+    } catch (URISyntaxException e) {
+        e.printStackTrace(); }
+    }
+    private String txt5 = "Hello I am the 5th doc, and I'm here to stay!";
+    private URI uri6;
+    { try {
+        uri6 = new URI("http://edu.yu.cs/com1320/project/doc6");
+    } catch (URISyntaxException e) {
+        e.printStackTrace();
+    }
+    }
+    private String txt6 = "Penguin Park Piccalo Pants Pain Possum and I'm here to STAY! awawawawawawawawawawawawawawawawawawawawawawaewaeaeaeaesrewarewsewrarewarewserwsercrcxvftvhgdbkjdbnwucbnuhfruynbwxuyfizwmbwfyxnuybnregh byugcnbgyxfrebygxbfrmuyzbvuybmfrbubfvubvexuybmzybmfubvmugbxmnxuvbrvnubnruzbuxyrewyhrfmuyzhbnuycbyftxbjnuynbxchgwybnxnbergrhghyrhxfytreuhxyhuxgccyhuebcgyhbwbfgyhegfddyhfgyehdfgyehbfgdhefdgyehedfgdhbvgyhbggyhbgvyhdbfgyhuefcgyhubfgeyehudxcgyhxucnhyunbxcghnbcbghjbcghbcghcfghbcghbcbghnbcgbhbcghnbcfghnbcfghbfcghnbcfghbcfghbghbcfghbgcfgdhbcf";
+    @Test
+    public void testThatProperlyManageStorageAdvanced() throws IOException {
+        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+        System.out.println("txt4 bytes = " + txt4.getBytes().length);
+        System.out.println("txt5 bytes = " + txt5.getBytes().length);
+        System.out.println("txt6 bytes = " + txt6.getBytes().length);
+        DocumentStore store = new DocumentStoreImpl();
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
+        assertEquals(1, store.search("PiE").size()); //this returns doc1
+        store.setMaxDocumentCount(3);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(store.getDocument(uri1));
+        assertNull(store.getDocument(uri2));
+        assertNotNull(store.getDocument(uri3));
+        assertNotNull(store.getDocument(uri4));
+        store.setMaxDocumentCount(5);
+        assertEquals(2, store.searchByPrefix("p").size()); //every doc but 4th (and 1st isn't in now)
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()),this.uri5, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()),this.uri6, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(store.getDocument(uri1));
+        assertNotNull(store.getDocument(uri2));
+        assertNotNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri4));
+        assertNotNull(store.getDocument(uri5));
+        assertNotNull(store.getDocument(uri6));
+        store.deleteDocument(uri6);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+        store.setMaxDocumentBytes(533);
+        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()),this.uri6, DocumentStore.DocumentFormat.TXT);
+        assertNull(store.getDocument(uri1));
+        assertNull(store.getDocument(uri2));
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri4));
+        assertNull(store.getDocument(uri5));
+        assertNotNull(store.getDocument(uri6));
+
+
+//        assertEquals(0, store.searchByPrefix("x").size());
+//        assertEquals(3, store.searchByPrefix("pi").size());
+//        assertEquals(5, store.search("PiZza").get(0).wordCount("pizza"));
+//        assertEquals(6, store.searchByPrefix("p").get(0).getWords().size());
+    }
+
     @Test
     public void testThatProperlyManageStorageBasic() throws IOException {
         DocumentStore store = new DocumentStoreImpl();
@@ -40,7 +114,7 @@ public class DocumentStoreImplTest {
         System.out.println("txt1 bytes = " + txt1.getBytes().length);
         System.out.println("txt2 bytes = " + txt2.getBytes().length);
         System.out.println("txt3 bytes = " + txt3.getBytes().length);
-        store.setMaxDocumentBytes(100); //i.e. should only be able to fit two docs
+        store.setMaxDocumentBytes(67); //i.e. should only be able to fit two docs
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
         assertNull(store.getDocument(uri1));
@@ -51,11 +125,18 @@ public class DocumentStoreImplTest {
         assertNotNull(store.getDocument(uri1));
         assertNotNull(store.getDocument(uri2));
         assertNull(store.getDocument(uri3));
-
-
-
-
-
+        store.setMaxDocumentBytes(38);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
+        assertNull(store.getDocument(uri1));
+        assertNull(store.getDocument(uri2));
+        assertNotNull(store.getDocument(uri3));
+        store.setMaxDocumentBytes(105);
+        store.setMaxDocumentCount(2);
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(store.getDocument(uri1));
+        assertNotNull(store.getDocument(uri2));
+        assertNull(store.getDocument(uri3));
 //        assertEquals(1, store.search("PiE").size());
 //        assertEquals(3, store.searchByPrefix("p").size());
 //        assertEquals(0, store.searchByPrefix("x").size());
