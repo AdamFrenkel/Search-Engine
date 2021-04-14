@@ -1,0 +1,5 @@
+package Registry;
+class Class{
+
+	
+}

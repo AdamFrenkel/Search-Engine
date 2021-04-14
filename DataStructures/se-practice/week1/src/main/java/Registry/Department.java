@@ -1,0 +1,4 @@
+package Registry;
+class Department{
+	
+}
