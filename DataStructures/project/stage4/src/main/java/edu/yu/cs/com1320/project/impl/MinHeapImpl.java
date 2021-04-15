@@ -10,6 +10,9 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
     }
     @Override
     public void reHeapify(E element) {
+        if(element == null){
+            throw new IllegalArgumentException("null in reHeapify");
+        }
         int k = this.getArrayIndex(element);
         boolean isGreater;
         if (elements[k/2] == null){
@@ -40,7 +43,7 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
     @Override
     protected int getArrayIndex(E element) {
         if(element == null){
-            throw new IllegalArgumentException("null element");
+            throw new IllegalArgumentException("null element in getArrayIndex");
         }
         for(int i = 0; i<elements.length; i++){
             if(elements[i] != null)
