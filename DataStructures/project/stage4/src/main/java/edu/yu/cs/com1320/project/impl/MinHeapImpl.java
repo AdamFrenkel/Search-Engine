@@ -28,7 +28,7 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
             upHeap(k);
         }
         else{
-            if(2*k+1<= elements.length) {
+            if(2*k+1 < elements.length) {
                 if(elements[2*k] == null ||elements[2*k+1] == null){
                     downHeap(k);
                 }else{
@@ -46,9 +46,10 @@ public class MinHeapImpl<E extends Comparable<E>> extends MinHeap<E> {
             throw new IllegalArgumentException("null element in getArrayIndex");
         }
         for(int i = 0; i<elements.length; i++){
-            if(elements[i] != null)
-            if (elements[i].equals(element)){
-                return i;
+            if(elements[i] != null) {
+                if (elements[i].equals(element)) {
+                    return i;
+                }
             }
         }
         throw new IllegalArgumentException("element not in array");
