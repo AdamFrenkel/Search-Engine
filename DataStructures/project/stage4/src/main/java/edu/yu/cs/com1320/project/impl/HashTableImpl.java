@@ -105,7 +105,7 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         if(k == null){
             throw new IllegalArgumentException("Tried to delete a null key");
         }
-        numberOfElementsInHT--;
+
         int i = Math.abs(k.hashCode()) % arraySize; //This is the slot in the array in which the value might be stored
         if (array[i] == null) {
             return null;
@@ -113,6 +113,7 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
         if(((objAndNextObj)array[i]).getKey().equals(k)){
             Value returnValue = ((objAndNextObj)array[i]).getValue();
             array[i] = ((objAndNextObj)array[i]).getNextObj();
+            numberOfElementsInHT--;
             return returnValue;
         }else{
             objAndNextObj currentObj = (objAndNextObj)array[i];
@@ -121,6 +122,7 @@ public class HashTableImpl<Key, Value> implements HashTable<Key, Value> {
                 currentObj = currentObj.getNextObj();
                 if(currentObj.getKey().equals(k)){
                     previousObj.addNextObj(currentObj.getNextObj());
+                    numberOfElementsInHT--;
                     return currentObj.getValue();
                 }
             }

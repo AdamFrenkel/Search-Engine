@@ -24,6 +24,7 @@ public class DocumentStoreImplTest {
     //my Stage 4 Tests
     //variables to hold possible values for doc1
     private URI uri4;
+
     { try {
         uri4 = new URI("http://edu.yu.cs/com1320/project/doc4");
     } catch (URISyntaxException e) {
@@ -48,6 +49,24 @@ public class DocumentStoreImplTest {
     }
     private String txt6 = "Penguin Park Piccalo Pants Pain Possum and I'm here to STAY! awawawawawawawawawawawawawawawawawawawawawawaewaeaeaeaesrewarewsewrarewarewserwsercrcxvftvhgdbkjdbnwucbnuhfruynbwxuyfizwmbwfyxnuybnregh byugcnbgyxfrebygxbfrmuyzbvuybmfrbubfvubvexuybmzybmfubvmugbxmnxuvbrvnubnruzbuxyrewyhrfmuyzhbnuycbyftxbjnuynbxchgwybnxnbergrhghyrhxfytreuhxyhuxgccyhuebcgyhbwbfgyhegfddyhfgyehdfgyehbfgdhefdgyehedfgdhbvgyhbggyhbgvyhdbfgyhuefcgyhubfgeyehudxcgyhxucnhyunbxcghnbcbghjbcghbcghcfghbcghbcbghnbcgbhbcghnbcfghnbcfghbfcghnbcfghbcfghbghbcfghbgcfgdhbcf";
     @Test
+    public void testThatProperlyManageStorageWithUndoAdvanced() throws IOException {
+        //whole test turns out to be unneccesary bc of piazza 364
+        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+        System.out.println("txt4 bytes = " + txt4.getBytes().length);
+        System.out.println("txt5 bytes = " + txt5.getBytes().length);
+        System.out.println("txt6 bytes = " + txt6.getBytes().length);
+        DocumentStore store = new DocumentStoreImpl();
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.setMaxDocumentCount(1);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+
+    }
+
+    @Test
     public void testThatProperlyManageStorageWithUndo() throws IOException {
         System.out.println("txt1 bytes = " + txt1.getBytes().length);
         System.out.println("txt2 bytes = " + txt2.getBytes().length);
@@ -62,6 +81,13 @@ public class DocumentStoreImplTest {
         store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()),this.uri5, DocumentStore.DocumentFormat.TXT);
         store.undo(uri2);
+        boolean pretest = true;
+        try {
+            store.undo(uri1);
+        } catch (IllegalStateException e) {
+            pretest = false;
+        }
+        assertTrue(pretest);
         store.setMaxDocumentCount(2);
         store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()),this.uri6, DocumentStore.DocumentFormat.TXT);
         assertNull(store.getDocument(uri1));
@@ -69,6 +95,13 @@ public class DocumentStoreImplTest {
         assertNull(store.getDocument(uri3));
         assertNull(store.getDocument(uri5));
         assertNotNull(store.getDocument(uri6));
+        boolean test = false;
+        try {
+            store.undo(uri1);
+        } catch (IllegalStateException e) {
+            test = true;
+        }
+        assertTrue(test);
         store.deleteDocument(uri2);
         store.getDocument(uri6);
         store.undo(uri2);
@@ -90,6 +123,29 @@ public class DocumentStoreImplTest {
         assertNull(store.getDocument(uri3));
         assertNull(store.getDocument(uri4));
         assertNotNull(store.getDocument(uri5));
+        assertNull(store.getDocument(uri6));
+        store.setMaxDocumentBytes(533);
+        boolean pretest2 = true;
+        try {
+            store.undo(uri1);
+        } catch (IllegalStateException e) {
+            pretest2 = false;
+        }
+        assertTrue(pretest2);
+        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()),this.uri6, DocumentStore.DocumentFormat.TXT);
+        boolean test2 = false;
+        try {
+            store.undo(uri1);
+        } catch (IllegalStateException e) {
+            test2 = true;
+        }
+        assertTrue(test2);
+        store.undo();
+        assertNull(store.getDocument(uri1));
+        assertNull(store.getDocument(uri2));
+        assertNull(store.getDocument(uri3));
+        assertNull(store.getDocument(uri4));
+        assertNull(store.getDocument(uri5));
         assertNull(store.getDocument(uri6));
     }
     @Test

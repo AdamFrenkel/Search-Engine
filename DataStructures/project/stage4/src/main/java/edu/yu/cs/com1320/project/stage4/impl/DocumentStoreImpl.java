@@ -110,6 +110,16 @@ public class DocumentStoreImpl implements DocumentStore {
                         }else{
                             docBytesAmount -= doc.getDocumentBinaryData().length;
                         }
+                        this.removeDocFromUndos(uriToDelete);
+                        //check out Piazza 364
+                        //StackImpl potStack = deletedDocsHT.get(uriToDelete);
+                        //if(potStack != null) {
+                        deletedDocsHT.put(uriToDelete, null);
+                        //}
+                       // potStack = replacedDocsHT.get(uriToDelete);
+                       // if(potStack != null) {
+                        replacedDocsHT.put(uriToDelete, null);
+                      //  }
 //                        doc.setLastUseTime(-10000);
 //                        leastUsedDocs.reHeapify(doc);
 //                        leastUsedDocs.remove();
@@ -599,11 +609,109 @@ public class DocumentStoreImpl implements DocumentStore {
     public void setMaxDocumentCount(int limit) {
         maxDocCountBoolean = true;
         maxDocumentCount = limit;
+        this.ensureHaveEnoughRoom();
     }
 
     @Override
     public void setMaxDocumentBytes(int limit) {
         maxDocBytesBoolean = true;
         maxDocumentBytes = limit;
+        this.ensureHaveEnoughRoom();
+    }
+
+    private void ensureHaveEnoughRoom(){
+        //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The hashtable piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
+        while((maxDocCountBoolean && docCount > maxDocumentCount) || (maxDocBytesBoolean && docBytesAmount > maxDocumentBytes)){
+            boolean haventFoundDocInStore = true;
+            while(haventFoundDocInStore) {
+                DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
+                if (hashTable.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
+                    haventFoundDocInStore = false;
+                    URI uriToDelete = leastUsedDoc.getKey();
+                    if(uriToDelete == null){
+                        throw new IllegalArgumentException("Tried to undo a null URI");
+                    }
+                    Document doc = hashTable.put(uriToDelete, null);
+                    //gets rid of all undos related to this uri BeH
+//                    if(doc == null){
+//                        return false;
+//                    }
+                    if(doc != null) {
+                        haventFoundDocInStore = false;
+                        Set<String> words = doc.getWords();
+                        for (String w : words) {
+                            trie.delete(w, doc);
+                        }
+                        //stage 4 stuff
+                        docCount--;
+                        if(doc.getDocumentTxt() != null) {
+                            docBytesAmount -= doc.getDocumentTxt().getBytes().length;
+                        }else{
+                            docBytesAmount -= doc.getDocumentBinaryData().length;
+                        }
+                        this.removeDocFromUndos(uriToDelete);
+                        //check out Piazza 364
+                        //StackImpl potStack = deletedDocsHT.get(uriToDelete);
+                        //if(potStack != null) {
+                        deletedDocsHT.put(uriToDelete, null);
+                        //}
+                        // potStack = replacedDocsHT.get(uriToDelete);
+                        // if(potStack != null) {
+                        replacedDocsHT.put(uriToDelete, null);
+                        //  }
+//                        doc.setLastUseTime(-10000);
+//                        leastUsedDocs.reHeapify(doc);
+//                        leastUsedDocs.remove();
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    private void removeDocFromUndos(URI uri) throws IllegalStateException {
+        if(uri == null){
+            throw new IllegalArgumentException("Tried to delete a null URI");
+        }
+
+        StackImpl holderStack = new StackImpl();
+        while(commandStack.size()>0){
+           // Boolean haventFoundURI = true;
+            if(commandStack.size() > 0) {
+                Undoable currentCommand = (Undoable) commandStack.pop();
+                if (currentCommand instanceof GenericCommand) {
+                    if (!(((GenericCommand) currentCommand).getTarget() == uri)) {
+                        // currentCommand.undo();
+                       //haventFoundURI = false;
+                        holderStack.push(currentCommand);
+                    }
+                } else {
+                    if (((CommandSet) currentCommand).containsTarget(uri)) {
+                        Iterator itr = ((CommandSet) currentCommand).iterator();
+
+                        while(itr.hasNext()) {
+                            GenericCommand generic = (GenericCommand) itr.next();
+                            if(generic.getTarget() == uri){
+                                itr.remove();
+                            }
+                        }
+                        // ((CommandSet) currentCommand).undo(uri);
+                       // haventFoundURI = false;
+                    }
+                    if (((CommandSet) currentCommand).size() != 0) {
+                        holderStack.push(currentCommand);
+                    }
+                }
+            }
+        }
+        while (holderStack.size() > 0) {
+                commandStack.push((Undoable) holderStack.pop());
+        }
+            // throw new IllegalStateException("there are no actions on the command stack for the given URI");
+
+        while (holderStack.size()>0){
+            commandStack.push((Undoable) holderStack.pop());
+        }
     }
 }
