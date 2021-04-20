@@ -5,14 +5,23 @@ import java.util.List;
 
 class Class{
     private String name;
-    private Professor professor = new Professor(123454321);
+    private Professor professor;
     private int time;
     private String days;
     private int classCode;
-    private Subject subject = new Subject();
+    private Subject subject = new Subject(123454321, "fakeSubject");
+    protected Class(int code,String name,Professor professor,String days,int time, List<Student> students) {
+        if (!(code == 246813579 || code == 123454321)) { //students and professors can't see BannerID
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.students = students;
+        this.time = time;
+        this.days = days;
+        this.professor = professor;
+        this.name = name;
+    }
 
-
-    private List<Student> students = new ArrayList<>();
+    private List<Student> students;
     protected String getName(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");

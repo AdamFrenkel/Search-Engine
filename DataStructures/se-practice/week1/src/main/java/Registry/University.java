@@ -12,6 +12,18 @@ class University{
 		}
 		return List.copyOf(this.schools);
 	}
+	protected List<Registrar> getRegistrars(int code){
+		if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
+			throw new IllegalCallerException("Access denied.");
+		}
+		return List.copyOf(this.registrars);
+	}
+	protected University(int code, String name){
+		if(!(code == 123454321)){
+			throw new IllegalCallerException("Access denied.");
+		}
+		this.name = name;
+	}
 	protected void addSchool(int code, School s){
 		if(!(code == 123454321)){
 			throw new IllegalCallerException("Access denied.");
@@ -26,7 +38,7 @@ class University{
 		if(!(code == 123454321)){
 			throw new IllegalCallerException("Access denied.");
 		}
-		s.changeUniversity(123454321,new University());
+		s.changeUniversity(123454321,new University(123454321,"fakeUniversity"));
 		schools.remove(s);
 	}
 	protected List<Registrar> getRegistrars(){

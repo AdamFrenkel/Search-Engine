@@ -6,14 +6,20 @@ import java.util.List;
 class Department{
     private String name;
     private List<Subject> subjects = new ArrayList<>();
-    private School school = new School();
+    private School school = new School(123454321,"fakeSchool");
+    protected Department(int code,String name) {
+        if (!(code == 246813579 || code == 123454321)) { //students and professors can't see BannerID
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.name = name;
+    }
     protected School getSchool(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
         return school;
     }
-    protected void changeSchool(int code, School s){
+    protected void changeSchool(int code, School s, int speacialCode){ //Don't call this method directly!!! Only from School!!!!
         if(school != null){
             if(!(code == school.getDeanCode(123454321)|| code == 123454321)){
                 throw new IllegalCallerException("Access denied.");
@@ -23,10 +29,17 @@ class Department{
                 throw new IllegalCallerException("Access denied.");
             }
         }
-        if (school != null) {
-            school.deleteDepartment(123454321,this);
+        if(speacialCode == 613) {
+            if (school != null) {
+                if (school.getDepartments(123454321).contains(this)) {
+                    school.deleteDepartment(123454321, this);
+                }
+            }
+//        if(!s.getDepartments(123454321).contains(this)) {
+//            s.addDepartment(123454321, this);
+//        }
+            school = s;
         }
-        s.addDepartment(123454321,this);
     }
     protected String getName(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
@@ -52,7 +65,7 @@ class Department{
             throw new IllegalCallerException("Access denied.");
         }
         //s.changeSchool(this.school);
-        s.changeDepartment(123454321,this);
+        s.changeDepartment(123454321,this,613);
         subjects.add(s);
     }
     protected void deleteSubject(Subject s,int code){
@@ -60,7 +73,7 @@ class Department{
             throw new IllegalCallerException("Access denied.");
         }
         //s.changeSchool(null);
-        s.changeDepartment(123454321,new Department());
+        s.changeDepartment(123454321,new Department(123454321,"fakeDepartment"),613);
         subjects.remove(s);
     }
     protected List<Class> getClasses(int code){

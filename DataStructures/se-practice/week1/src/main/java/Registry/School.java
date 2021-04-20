@@ -9,8 +9,12 @@ class School{
     private List<Department> departments = new ArrayList<>();
     private List<Dean> deans = new ArrayList<>();
     private int deanCode;
-    private University schoolsUniversity = new University();
-    protected School(){
+    private University schoolsUniversity = new University(123454321, "fakeUniversity");
+    protected School(int code, String name){
+        if(!(code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.name = name;
         int min = -100000;
         int max = 100000;
         this.changeDeanCode(123454321,(int)Math.floor(Math.random()*(max-min+1)+min));
@@ -83,14 +87,16 @@ class School{
         if(!(code == 123454321 || code == this.deanCode)){
             throw new IllegalCallerException("Access denied.");
         }
-        d.changeSchool(123454321,this);
+        if(!d.getSchool(123454321).equals(this)) {
+            d.changeSchool(123454321, this, 613);
+        }
         departments.add(d);
     }
     protected void deleteDepartment(int code, Department d){//if dean of this school putt in your deanCode
         if(!(code == 123454321 || code == this.deanCode)){
             throw new IllegalCallerException("Access denied.");
         }
-        d.changeSchool(123454321,new School());
+        d.changeSchool(123454321,new School(123454321, "fakeSchool"), 613);
         departments.remove(d);
     }
     protected List<Subject> getSubjects(int code){

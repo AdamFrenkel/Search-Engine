@@ -8,14 +8,20 @@ class Subject {
     private List<Class> classes = new ArrayList<>();
     private int credits = 0;
     private List<Class> prerequisites = new ArrayList<>();
-    private Department department = new Department();
+    private Department department = new Department(123454321,"fakeDepartment");
+    protected Subject(int code,String name) {
+        if (!(code == 246813579 || code == 123454321)) { //students and professors can't see BannerID
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.name = name;
+    }
     protected Department getDepartment(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
         return department;
     }
-    protected void changeDepartment(int code, Department d){
+    protected void changeDepartment(int code, Department d, int speacialCode){//Only call from Deaprtemnt!!!!!!!!!!
         if(department != null){
             if(!(code == department.getSchool(123454321).getDeanCode(123454321)|| code == 123454321)){
                 throw new IllegalCallerException("Access denied.");
@@ -25,10 +31,13 @@ class Subject {
                 throw new IllegalCallerException("Access denied.");
             }
         }
-        if (department != null) {
-            department.deleteSubject(this,123454321);
+//        if (department != null) {
+//            department.deleteSubject(this,123454321);
+//        }
+        if(speacialCode == 613) {
+           // d.addSubject(this, 123454321);
+            department = d;
         }
-        d.addSubject(this,123454321);
 
     }
     protected String getName(int code){
@@ -72,7 +81,7 @@ class Subject {
         if(!(code == department.getSchool(123454321).getDeanCode(123454321) || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
-        c.changeSubject(123454321, new Subject());
+        c.changeSubject(123454321, new Subject(123454321,"fakeSubject"));
         classes.remove(c);
     }
     protected List<Class> getPrerequisites(int code){

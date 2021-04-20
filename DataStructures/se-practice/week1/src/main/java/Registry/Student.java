@@ -2,20 +2,22 @@ package Registry;
 
 import java.util.List;
 
-class Student{
+class Student implements Person{
     //protected final int accessPower = 1;
 	private String name;
     private int bannerID;
     private int permissionCode = 13579;
     private Transcript transcript;
     private List<Class> classes;
-    protected Student(int code){
+    protected Student(int code,String name){
         if(!(code == 246813579 || code == 123454321)){ //students and professors can't see BannerID
             throw new IllegalCallerException("Access denied.");
         }
         int min = -100000;
         int max = 100000;
         bannerID = (int)Math.floor(Math.random()*(max-min+1)+min);
+        this.name = name;
+        this.transcript = new Transcript(this,123454321);
     }
 	protected void setName(String name, int code){
         if(!(code == 246813579 || code == 123454321)){
@@ -24,7 +26,7 @@ class Student{
         this.name = name;
 
     }
-    protected String getName(int code){
+    public String getName(int code){
         if(!(code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }return name;
