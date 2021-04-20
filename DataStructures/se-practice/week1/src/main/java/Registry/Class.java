@@ -5,11 +5,11 @@ import java.util.List;
 
 class Class{
     private String name;
-    private Professor professor;
+    private Professor professor = new Professor(123454321);
     private int time;
     private String days;
     private int classCode;
-    private Subject subject;
+    private Subject subject = new Subject();
 
 
     private List<Student> students = new ArrayList<>();
@@ -45,13 +45,42 @@ class Class{
         if(!(code == subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
+        professor.deleteClass(123454321, this);
+        p.addClass(123454321, this);
         this.professor = p;
+    }
+    protected void changeDayAndTime(int code,String days, int time){
+        if(!(code == subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) || code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.time = time;
+        this.days = days;
     }
     protected List<Student> getStudents(int code){
         if(!(subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) == code || code == 123454321 || professor.getClassCode(123454321) == code)){
             throw new IllegalCallerException("Access denied.");
         }
         return List.copyOf(students);
+    }
+    protected void addStudent(int code, Student s){
+        if(!(subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) == code || code == 123454321 || professor.getClassCode(123454321) == code)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        List<Class> prerequisites = this.getSubject(123454321).getPrerequisites(123454321);
+        for(Class pre : prerequisites) {
+            if (!s.getTranscript(123454321).takenClass(123454321, pre)){
+                throw new IllegalStateException("Haven't fulfilled prerequisites");
+            }
+        }
+        s.addClass(123454321, this);
+        students.add(s);
+    }
+    protected void deleteStudent(int code, Student s){
+        if(!(subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) == code || code == 123454321 || professor.getClassCode(123454321) == code)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        s.deleteClass(123454321, this);
+        students.remove(s);
     }
     protected int getTime(int code){ //put code or classCode or bannerID if student in class
         if(!(subject.getDepartment(123454321).getSchool(123454321).getDeanCode(123454321) == code || code == 123454321 || professor.getClassCode(123454321) == code)){

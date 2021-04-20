@@ -6,7 +6,7 @@ import java.util.List;
 class Department{
     private String name;
     private List<Subject> subjects = new ArrayList<>();
-    private School school;
+    private School school = new School();
     protected School getSchool(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
@@ -60,7 +60,7 @@ class Department{
             throw new IllegalCallerException("Access denied.");
         }
         //s.changeSchool(null);
-        s.changeDepartment(123454321,null);
+        s.changeDepartment(123454321,new Department());
         subjects.remove(s);
     }
     protected List<Class> getClasses(int code){

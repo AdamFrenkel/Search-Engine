@@ -9,7 +9,7 @@ class School{
     private List<Department> departments = new ArrayList<>();
     private List<Dean> deans = new ArrayList<>();
     private int deanCode;
-    private University schoolsUniversity;
+    private University schoolsUniversity = new University();
     protected School(){
         int min = -100000;
         int max = 100000;
@@ -62,6 +62,7 @@ class School{
             throw new IllegalCallerException("Access denied.");
         }
         d.setDeanCode(deanCode,123454321);
+        d.setSchool(123454321, this);
         deans.add(d);
     }
     protected void deleteDean(int code, Dean d){//if dean of this school put in your deanCode
@@ -69,6 +70,7 @@ class School{
             throw new IllegalCallerException("Access denied.");
         }
         d.setDeanCode(0,123454321);
+        d.setSchool(123454321, null);
         deans.remove(d);
     }
     protected List<Department> getDepartments(int code){
@@ -88,7 +90,7 @@ class School{
         if(!(code == 123454321 || code == this.deanCode)){
             throw new IllegalCallerException("Access denied.");
         }
-        d.changeSchool(123454321,null);
+        d.changeSchool(123454321,new School());
         departments.remove(d);
     }
     protected List<Subject> getSubjects(int code){

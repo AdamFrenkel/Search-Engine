@@ -26,7 +26,7 @@ class University{
 		if(!(code == 123454321)){
 			throw new IllegalCallerException("Access denied.");
 		}
-		s.changeUniversity(123454321,null);
+		s.changeUniversity(123454321,new University());
 		schools.remove(s);
 	}
 	protected List<Registrar> getRegistrars(){

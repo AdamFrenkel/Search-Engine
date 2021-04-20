@@ -6,9 +6,9 @@ import java.util.List;
 class Subject {
     private String name;
     private List<Class> classes = new ArrayList<>();
-    private int credits;
+    private int credits = 0;
     private List<Class> prerequisites = new ArrayList<>();
-    private Department department;
+    private Department department = new Department();
     protected Department getDepartment(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
@@ -43,6 +43,18 @@ class Subject {
         }
         this.name = name;
     }
+    protected int getCredits(int code){
+        if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        return credits;
+    }
+    protected void changeCredits(int code, int credits){
+        if(!(code == department.getSchool(123454321).getDeanCode(123454321) || code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.credits = credits;
+    }
     protected List<Class> getClasses(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
@@ -60,7 +72,7 @@ class Subject {
         if(!(code == department.getSchool(123454321).getDeanCode(123454321) || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
-        c.changeSubject(123454321, null);
+        c.changeSubject(123454321, new Subject());
         classes.remove(c);
     }
     protected List<Class> getPrerequisites(int code){
