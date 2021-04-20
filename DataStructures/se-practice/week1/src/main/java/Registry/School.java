@@ -8,12 +8,48 @@ class School{
     private String name;
     private List<Department> departments = new ArrayList<>();
     private List<Dean> deans = new ArrayList<>();
-
+    private int deanCode;
+    private University schoolsUniversity;
+    protected School(){
+        int min = -100000;
+        int max = 100000;
+        this.changeDeanCode(123454321,(int)Math.floor(Math.random()*(max-min+1)+min));
+    }
+    protected University getUniversity(int code){
+        if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        return schoolsUniversity;
+    }
+    protected void changeUniversity(int code, University u){
+        if(!(code == this.deanCode|| code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.schoolsUniversity = u;
+    }
     protected String getName(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
         return name;
+    }
+    protected void changeName(int code, String name){
+        if(!(code == this.deanCode || code == 123454321)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.name = name;
+    }
+    protected int getDeanCode(int code){
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        return deanCode;
+    }
+    protected void changeDeanCode(int code, int newDeanCode){
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        this.deanCode = newDeanCode;
     }
     protected List<Dean> getDeans(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
@@ -21,11 +57,39 @@ class School{
         }
         return List.copyOf(deans);
     }
+    protected void addDean(int code, Dean d){//if dean of this school putt in your deanCode
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        d.setDeanCode(deanCode,123454321);
+        deans.add(d);
+    }
+    protected void deleteDean(int code, Dean d){//if dean of this school put in your deanCode
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        d.setDeanCode(0,123454321);
+        deans.remove(d);
+    }
     protected List<Department> getDepartments(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
             throw new IllegalCallerException("Access denied.");
         }
         return List.copyOf(departments);
+    }
+    protected void addDepartment(int code, Department d){//if dean of this school putt in your deanCode
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        d.changeSchool(123454321,this);
+        departments.add(d);
+    }
+    protected void deleteDepartment(int code, Department d){//if dean of this school putt in your deanCode
+        if(!(code == 123454321 || code == this.deanCode)){
+            throw new IllegalCallerException("Access denied.");
+        }
+        d.changeSchool(123454321,null);
+        departments.remove(d);
     }
     protected List<Subject> getSubjects(int code){
         if(!(code == 13579 || code == 246810 || code == 246813579 || code == 123454321)){
