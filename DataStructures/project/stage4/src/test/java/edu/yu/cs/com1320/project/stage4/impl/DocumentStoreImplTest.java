@@ -6,8 +6,10 @@ import edu.yu.cs.com1320.project.HashTable;
 import edu.yu.cs.com1320.project.impl.HashTableImpl;
 import edu.yu.cs.com1320.project.stage4.Document;
 import edu.yu.cs.com1320.project.stage4.DocumentStore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import edu.yu.cs.com1320.project.impl.MinHeapImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -48,23 +50,38 @@ public class DocumentStoreImplTest {
     }
     }
     private String txt6 = "Penguin Park Piccalo Pants Pain Possum and I'm here to STAY! awawawawawawawawawawawawawawawawawawawawawawaewaeaeaeaesrewarewsewrarewarewserwsercrcxvftvhgdbkjdbnwucbnuhfruynbwxuyfizwmbwfyxnuybnregh byugcnbgyxfrebygxbfrmuyzbvuybmfrbubfvubvexuybmzybmfubvmugbxmnxuvbrvnubnruzbuxyrewyhrfmuyzhbnuycbyftxbjnuynbxchgwybnxnbergrhghyrhxfytreuhxyhuxgccyhuebcgyhbwbfgyhegfddyhfgyehdfgyehbfgdhefdgyehedfgdhbvgyhbggyhbgvyhdbfgyhuefcgyhubfgeyehudxcgyhxucnhyunbxcghnbcbghjbcghbcghcfghbcghbcbghnbcgbhbcghnbcfghnbcfghbfcghnbcfghbcfghbghbcfghbgcfgdhbcf";
-    @Test
-    public void testThatProperlyManageStorageWithUndoAdvanced() throws IOException {
-        //whole test turns out to be unneccesary bc of piazza 364
-        System.out.println("txt1 bytes = " + txt1.getBytes().length);
-        System.out.println("txt2 bytes = " + txt2.getBytes().length);
-        System.out.println("txt3 bytes = " + txt3.getBytes().length);
-        System.out.println("txt4 bytes = " + txt4.getBytes().length);
-        System.out.println("txt5 bytes = " + txt5.getBytes().length);
-        System.out.println("txt6 bytes = " + txt6.getBytes().length);
-        DocumentStore store = new DocumentStoreImpl();
-        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
-        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
-        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
-        store.setMaxDocumentCount(1);
-        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
-
-    }
+//    @Test
+//    public void testHeap() throws IOException {
+//        //whole test turns out to be unneccesary bc of piazza 364
+//        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+//        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+//        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+//        System.out.println("txt4 bytes = " + txt4.getBytes().length);
+//        System.out.println("txt5 bytes = " + txt5.getBytes().length);
+//        System.out.println("txt6 bytes = " + txt6.getBytes().length);
+//        MinHeapImpl<Document> heap = new MinHeapImpl<>();
+//        DocumentImpl doc1 = new DocumentImpl(this.uri1,this.txt1);
+//        heap.insert(doc1);
+//        DocumentImpl doc2 = new DocumentImpl(this.uri2,this.txt2);
+//        heap.insert(doc2);
+//        DocumentImpl doc3 = new DocumentImpl(this.uri3,this.txt3);
+//        heap.insert(doc3);
+//        DocumentImpl doc4 = new DocumentImpl(this.uri4,this.txt4);
+//        heap.insert(doc4);
+//        DocumentImpl doc5 = new DocumentImpl(this.uri5,this.txt5);
+//        heap.insert(doc5);
+//        DocumentImpl doc6 = new DocumentImpl(this.uri6,this.txt6);
+//        heap.insert(doc6);
+//        heap.getArrayIndex
+//        //Assertheap.remove();
+////        DocumentStore store = new DocumentStoreImpl();
+////        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+////        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+////        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+////        store.setMaxDocumentCount(1);
+////        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+//
+//    }
 
     @Test
     public void testThatProperlyManageStorageWithUndo() throws IOException {
