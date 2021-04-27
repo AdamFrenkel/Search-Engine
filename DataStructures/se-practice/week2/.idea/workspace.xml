@@ -5,15 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cf720e3b-da26-42ef-b0e8-95513d63bf81" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/edu/yu/registrar/model/PublicAPITest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../week1/src/test/java/Registry/UniversityTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../week1/src/test/java/Registry/UniversityTestTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/publicAPI" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/PublicAPI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/PublicAPITest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/week2.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/edu/yu/registrar/model/PublicAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/yu/registrar/model/PublicAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/edu/yu/registrar/model/PublicAPITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/edu/yu/registrar/model/PublicAPITest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +53,14 @@
       <option name="presentableId" value="Default" />
       <updated>1619558651859</updated>
     </task>
+    <task id="LOCAL-00001" summary="lots of fixing up and changing of week2">
+      <created>1619561385524</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1619561385562</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -71,5 +73,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="lots of fixing up and changing of week2" />
+    <MESSAGE value="week2 did a bunch" />
+    <option name="LAST_COMMIT_MESSAGE" value="week2 did a bunch" />
   </component>
 </project>

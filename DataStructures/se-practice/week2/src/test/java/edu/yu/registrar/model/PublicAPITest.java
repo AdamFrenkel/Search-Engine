@@ -19,6 +19,7 @@ class PublicAPITest {
     CourseOffering iCTRJudahDiament;
     CourseOffering dSTRJudahDiament;
     PublicAPI publicAPI;
+//    Student mosheGoldstien;
     @BeforeEach
     public void init() {
         yC = new School("Yeshiva College");
@@ -33,6 +34,7 @@ class PublicAPITest {
         dSTRJudahDiament = new CourseOffering(dS, 2021, CourseOffering.Semester.SPRING, judahDiament);
         dS.addPrerequisite(introToCS);
         publicAPI = new PublicAPI();
+//        mosheGoldstien = new Student();
     }
     @Test
     public void testRegisterForClass(){
@@ -52,6 +54,22 @@ class PublicAPITest {
             failedToRegisterJudahForClass = true;
         }
         assertTrue(failedToRegisterJudahForClass);
+    }
+
+    @Test
+    public void testCreateClassOffering(){
+        boolean failedToCreateClass = false;
+        try {
+            publicAPI.createClassOffering(adamFrenkel.getId(), introToCS,2021,CourseOffering.Semester.FALL,judahDiament.getId());
+        }catch(IllegalAccessError e){
+            failedToCreateClass = true;
+        }
+        assertTrue(failedToCreateClass);
+        CourseOffering returnCourseOffering = publicAPI.createClassOffering(judahDiament.getId(), introToCS,2021,CourseOffering.Semester.FALL,judahDiament.getId());
+        assertEquals("2021", returnCourseOffering.getYear());
+        assertEquals(judahDiament, returnCourseOffering.getProfessor());
+        assertEquals(introToCS,returnCourseOffering.getCourse());
+        assertEquals(CourseOffering.Semester.FALL,returnCourseOffering.getSemester());
     }
 
 
@@ -140,6 +158,18 @@ class PublicAPITest {
         assertTrue(failedToGiveGrade);
         assertEquals(98, publicAPI.giveGrade(barryEichler.getId(), adamFrenkel.getId(), dSTRJudahDiament, 99));
         assertEquals(99, publicAPI.giveGrade(johnSmith.getId(), adamFrenkel.getId(), dSTRJudahDiament, 100));
+    }
+    @Test
+    public void testGetGrade(){
+        publicAPI.giveGrade(judahDiament.getId(), adamFrenkel.getId(), dSTRJudahDiament, 100);
+        assertEquals(100,publicAPI.getGrade(adamFrenkel.getId(),dS));
+        boolean failedToGetGrade = false;
+        try {
+            publicAPI.getGrade(judahDiament.getId(),dS);
+        } catch (UnauthorizedActionException e) {
+            failedToGetGrade = true;
+        }
+        assertTrue(failedToGetGrade);
     }
 
 

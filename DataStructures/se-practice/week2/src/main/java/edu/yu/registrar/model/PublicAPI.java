@@ -4,27 +4,30 @@ import java.util.Set;
 
 public class PublicAPI{
 
-    /**
-     * Register's a student for class if he has the right prerequisites
-     * @param ID
-     * @param ClassNumber
-     * @return true if successfully registered the student for class
-     */
-    public boolean registerForClass(int ID, int ClassNumber){
-        return false;
-    }
 
     /**
-     *
+     * An employee can create a class offering
      * @param ID
-     * @param name
-     * @param department
-     * @param number
-     * @return
+     * @param course
+     * @param year
+     * @param semester
+     * @param professorID
+     * @return the new class offering.  Throws an error if a student try to create a classOffering
      */
-    public Class createClass(int ID, String name, Department department, int number){
+    public CourseOffering createClassOffering(int ID, Course course, int year, CourseOffering.Semester semester, int professorID){
         return null;
     }
+
+    /** Anyone in the school can search for a specific major.
+     * @param ID
+     * @param majorName
+     * @return a specific Major, if there is one, null if not.  A student and professor gets an
+     * immutable major, while a dean and registrar get the actual major.
+     */
+    public Major searchForMajor(int ID,String majorName){
+        return null;
+    }
+
 
     /**
      * Anyone in the school can search for a specific class offering.
@@ -39,16 +42,16 @@ public class PublicAPI{
         return null;
     }
 
-   // public Set<Course> searchClassPrerequisites(int ID,int classNumber){}
 
-    /** Anyone in the school can search for a specific major.
+
+    /**
+     * Register's a student for class if he has the right prerequisites
      * @param ID
-     * @param majorName
-     * @return a specific Major, if there is one, null if not.  A student and professor gets an
-     * immutable major, while a dean and registrar get the actual major.
+     * @param ClassNumber
+     * @return true if successfully registered the student for class
      */
-    public Major searchForMajor(int ID,String majorName){
-        return null;
+    public boolean registerForClass(int ID, int ClassNumber){
+        return false;
     }
 
     /**
@@ -73,6 +76,16 @@ public class PublicAPI{
         return 0;
     }
 
+    /**
+     * Student gets his grades for a specific course
+     * @param Id
+     * @param course
+     * @return the dtudent's grade or throw an error if the Id is an employees.
+     */
+    public double getGrade(int Id, Course course){
+        return 0;
+    }
+
 
 
 }
@@ -87,7 +100,7 @@ public class PublicAPI{
 
 
 
-
+// public Set<Course> searchClassPrerequisites(int ID,int classNumber){}
 //
 ///**
 // * When a student or professor perfoms a course search:
