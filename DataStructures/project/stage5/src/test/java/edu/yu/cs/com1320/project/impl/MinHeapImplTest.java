@@ -1,7 +1,7 @@
 package edu.yu.cs.com1320.project.impl;
 
-import edu.yu.cs.com1320.project.stage4.Document;
-import edu.yu.cs.com1320.project.stage4.impl.DocumentImpl;
+import edu.yu.cs.com1320.project.stage5.Document;
+import edu.yu.cs.com1320.project.stage5.impl.DocumentImpl;
 import org.junit.Test;
 
 import java.io.IOException;

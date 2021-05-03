@@ -4,10 +4,8 @@ package edu.yu.cs.com1320.project.stage5.impl;
 import edu.yu.cs.com1320.project.CommandSet;
 import edu.yu.cs.com1320.project.GenericCommand;
 import edu.yu.cs.com1320.project.Undoable;
-import edu.yu.cs.com1320.project.impl.HashTableImpl;
-import edu.yu.cs.com1320.project.impl.StackImpl;
-import edu.yu.cs.com1320.project.impl.MinHeapImpl;
-import edu.yu.cs.com1320.project.impl.TrieImpl;
+//import edu.yu.cs.com1320.project.impl.HashTableImpl;
+import edu.yu.cs.com1320.project.impl.*;
 import edu.yu.cs.com1320.project.stage5.Document;
 import edu.yu.cs.com1320.project.stage5.DocumentStore;
 
@@ -20,8 +18,10 @@ import java.util.function.Function;
 public class DocumentStoreImpl implements DocumentStore {
     private StackImpl<Undoable> commandStack = new StackImpl<>();
 //    private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
-//    private HashTableImpl<URI, StackImpl> deletedDocsHT = new HashTableImpl<>();
-//    private HashTableImpl<URI, StackImpl> replacedDocsHT = new HashTableImpl<>(); //This will map uris of the OG doc to the doc repaced by it
+    private BTreeImpl<URI, Document> docStoreBTree = new BTreeImpl<>();
+   // private WrongBTree <URI, Document> docStoreBTree = new WrongBTree<>();
+    private Map<URI, StackImpl> deletedDocsHT = new HashMap<>();
+    private Map<URI, StackImpl> replacedDocsHT = new HashMap<>(); //This will map uris of the OG doc to the doc repaced by it
     private TrieImpl<Document> trie = new TrieImpl<>();
     private boolean maxDocCountBoolean = false;
     private boolean maxDocBytesBoolean = false;
@@ -46,7 +46,7 @@ public class DocumentStoreImpl implements DocumentStore {
         //First Piece is a delete
         DocumentImpl docReturn;
         if (input == null) {
-            docReturn = (DocumentImpl)hashTable.put(uri, null);
+            docReturn = (DocumentImpl)docStoreBTree.put(uri, null);
             this.deleteFromPut(uri, docReturn);
 
             return docReturn == null ? 0 : docReturn.hashCode();
@@ -67,32 +67,38 @@ public class DocumentStoreImpl implements DocumentStore {
 //        }
         this.ensureHaveEnoughRoom(uri,bD);
         //need for a few stages
-        docReturn = (DocumentImpl)hashTable.put(uri, doc);
+        docReturn = (DocumentImpl)docStoreBTree.put(uri, doc);
         //new stuff for stage 3 ie: trie stuff
         putStage3(doc, docReturn);
         return this.putFromPut(uri,docReturn,format,doc);
     }
-    private void ensureHaveEnoughRoom(URI uri, byte[] newBD){
+    private void ensureHaveEnoughRoom(URI uri, byte[] newBD) {
         int lengthOfBdGettingReplaced = 0;
-        if(hashTable.get(uri) != null){
-            if(hashTable.get(uri).getDocumentTxt() != null) {
-                lengthOfBdGettingReplaced = hashTable.get(uri).getDocumentTxt().getBytes().length;
+        if(docStoreBTree.get(uri) != null){
+            if(docStoreBTree.get(uri).getDocumentTxt() != null) {
+                lengthOfBdGettingReplaced = docStoreBTree.get(uri).getDocumentTxt().getBytes().length;
             }else{
-                lengthOfBdGettingReplaced = hashTable.get(uri).getDocumentBinaryData().length;
+                lengthOfBdGettingReplaced = docStoreBTree.get(uri).getDocumentBinaryData().length;
             }
         }
-        //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The hashtable piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
-        while((maxDocCountBoolean && docCount + 1 > maxDocumentCount && hashTable.get(uri) == null) || (maxDocBytesBoolean && (docBytesAmount + newBD.length - lengthOfBdGettingReplaced) > maxDocumentBytes)){
+        //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The docStoreBTree piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
+        while((maxDocCountBoolean && docCount + 1 > maxDocumentCount && docStoreBTree.get(uri) == null) || (maxDocBytesBoolean && (docBytesAmount + newBD.length - lengthOfBdGettingReplaced) > maxDocumentBytes)){
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
                 DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
-                if (hashTable.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
+                if (docStoreBTree.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
                     haventFoundDocInStore = false;
                     URI uriToDelete = leastUsedDoc.getKey();
                     if(uriToDelete == null){
                         throw new IllegalArgumentException("Tried to undo a null URI");
                     }
-                    Document doc = hashTable.put(uriToDelete, null);
+                    Document doc = docStoreBTree.get(uriToDelete);
+                    try{
+                        docStoreBTree.moveToDisk(uriToDelete);
+                    }catch(Exception e){
+                        throw new IllegalArgumentException("I don't know what happened- but apparently there can be an exception called when moving to disc, but it's not really an illeagal argument one? GL");
+                    }
+
                     //gets rid of all undos related to this uri BeH
 //                    if(doc == null){
 //                        return false;
@@ -233,7 +239,7 @@ public class DocumentStoreImpl implements DocumentStore {
             newBdToAdd = docThatWASreplaced.getDocumentBinaryData();
         }
         this.ensureHaveEnoughRoom(uri1,newBdToAdd);
-        DocumentImpl docThatReplaced = (DocumentImpl) hashTable.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
+        DocumentImpl docThatReplaced = (DocumentImpl) docStoreBTree.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
         if(docThatReplaced != null) {
             Set<String> words = docThatReplaced.getWords();
             for (String w : words) {
@@ -267,7 +273,7 @@ public class DocumentStoreImpl implements DocumentStore {
         if(uri1 == null){
             throw new IllegalArgumentException("Tried to undo a null URI");
         }
-        Document doc = hashTable.put(uri1, null);
+        Document doc = docStoreBTree.put(uri1, null);
         if(doc == null){
             return false;
         }
@@ -301,7 +307,7 @@ public class DocumentStoreImpl implements DocumentStore {
         if(uri == null){
             throw new IllegalArgumentException("Tried to get a null URI");
         }
-        Document returnDoc = (Document) hashTable.get(uri);
+        Document returnDoc = (Document) docStoreBTree.get(uri);
         if(returnDoc != null) {
             returnDoc.setLastUseTime(System.nanoTime());
             leastUsedDocs.reHeapify(returnDoc);
@@ -318,7 +324,7 @@ public class DocumentStoreImpl implements DocumentStore {
         if(uri == null){
             throw new IllegalArgumentException("Tried to delete a null URI");
         }
-        DocumentImpl doc = (DocumentImpl) hashTable.put(uri, null);
+        DocumentImpl doc = (DocumentImpl) docStoreBTree.put(uri, null);
         //new stuff for stage 3
         if(doc != null){
             Set<String> words = doc.getWords();
@@ -370,7 +376,7 @@ public class DocumentStoreImpl implements DocumentStore {
             }
             this.ensureHaveEnoughRoom(uri1, newBdToAdd);
         }
-        hashTable.put(uri1, doc);
+        docStoreBTree.put(uri1, doc);
         //new stuff for stage 3
         if(doc != null) {
             Set<String> words = doc.getWords();
@@ -534,7 +540,7 @@ public class DocumentStoreImpl implements DocumentStore {
         Set<URI> uris = new HashSet<>();
         Boolean areThereAnyDocs = false;
         for(Document d : deletedDocs){
-            hashTable.put(d.getKey(),null);
+            docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
             //stage 4 stuff
             docCount--;
@@ -571,7 +577,7 @@ public class DocumentStoreImpl implements DocumentStore {
         Set<URI> uris = new HashSet<>();
         Boolean areThereAnyDocs = false;
         for(Document d : deletedDocs){
-            hashTable.put(d.getKey(),null);
+            docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
             //stage 4 stuff
             docCount--;
@@ -620,18 +626,18 @@ public class DocumentStoreImpl implements DocumentStore {
     }
 
     private void ensureHaveEnoughRoom(){
-        //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The hashtable piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
+        //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The docStoreBTree piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
         while((maxDocCountBoolean && docCount > maxDocumentCount) || (maxDocBytesBoolean && docBytesAmount > maxDocumentBytes)){
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
                 DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
-                if (hashTable.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
+                if (docStoreBTree.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
                     haventFoundDocInStore = false;
                     URI uriToDelete = leastUsedDoc.getKey();
                     if(uriToDelete == null){
                         throw new IllegalArgumentException("Tried to undo a null URI");
                     }
-                    Document doc = hashTable.put(uriToDelete, null);
+                    Document doc = docStoreBTree.put(uriToDelete, null);
                     //gets rid of all undos related to this uri BeH
 //                    if(doc == null){
 //                        return false;

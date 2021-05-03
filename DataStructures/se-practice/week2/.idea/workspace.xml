@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cf720e3b-da26-42ef-b0e8-95513d63bf81" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../project/stage5/src/main/java/edu/yu/cs/com1320/project/stage5/impl/DocumentStoreImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../project/stage5/src/main/java/edu/yu/cs/com1320/project/stage5/impl/DocumentStoreImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/edu/yu/registrar/model/PublicAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/edu/yu/registrar/model/PublicAPI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/edu/yu/registrar/model/PublicAPITest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/edu/yu/registrar/model/PublicAPITest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +59,14 @@
       <option name="project" value="LOCAL" />
       <updated>1619561385562</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="week2 did a bunch">
+      <created>1619565480615</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1619565480616</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

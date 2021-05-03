@@ -1,13 +1,13 @@
 package edu.yu.cs.com1320.project.stage5.impl;
 
-import edu.yu.cs.com1320.project.impl.HashTableImpl;
+//import edu.yu.cs.com1320.project.impl.HashTableImpl;
 import edu.yu.cs.com1320.project.stage5.Document;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class DocumentImpl implements Document {
 
@@ -18,7 +18,7 @@ public class DocumentImpl implements Document {
     private String txt = null;
     private byte[] binaryData = null;
 
-    private HashTableImpl<String, Integer> wordCount = new HashTableImpl<>();
+    private Map<String, Integer> wordCount = new HashMap<>();
     private Set<String> words = new HashSet<>();
 
     /**
@@ -178,6 +178,16 @@ public class DocumentImpl implements Document {
     @Override
     public void setLastUseTime(long timeInNanoseconds) {
         lastUseTime = timeInNanoseconds;
+    }
+
+    @Override
+    public Map<String, Integer> getWordMap() {
+        return wordCount;
+    }
+
+    @Override
+    public void setWordMap(Map<String, Integer> wordMap) {
+        this.wordCount = wordMap;
     }
 
     @Override

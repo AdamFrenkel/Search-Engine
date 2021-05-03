@@ -1,6 +1,7 @@
 package edu.yu.cs.com1320.project.stage5;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
 public interface Document extends Comparable<Document>
@@ -38,4 +39,15 @@ public interface Document extends Comparable<Document>
      */
     long getLastUseTime();
     void setLastUseTime(long timeInNanoseconds);
+
+    /**
+     * @return a copy of the word to count map so it can be serialized
+     */
+    Map<String,Integer> getWordMap();
+
+    /**
+     * This must set the word to count map during deserialization
+     * @param wordMap
+     */
+    void setWordMap(Map<String,Integer> wordMap);
 }
