@@ -22,7 +22,7 @@
       <change beforePath="$PROJECT_DIR$/../../project/stage5/target/test-classes/edu/yu/cs/com1320/project/stage4/impl/UndoTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../project/stage5/target/test-classes/edu/yu/cs/com1320/project/stage4/impl/UndoTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../project/stage5/target/test-classes/edu/yu/cs/com1320/project/stage5/impl/PersistenceManagerImplTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../project/stage5/target/test-classes/edu/yu/cs/com1320/project/stage5/impl/PersistenceManagerImplTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../project/stage5/www.yu.edu/documents/doc6.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../project/stage5/www.yu.edu/documents/doc6.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +112,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620159183686</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="update pom week 2">
+      <created>1620159571220</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1620159571221</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

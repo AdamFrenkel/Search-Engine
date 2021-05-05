@@ -8,7 +8,9 @@ import edu.yu.cs.com1320.project.Undoable;
 import edu.yu.cs.com1320.project.impl.*;
 import edu.yu.cs.com1320.project.stage5.Document;
 import edu.yu.cs.com1320.project.stage5.DocumentStore;
+import edu.yu.cs.com1320.project.stage5.PersistenceManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,6 +32,10 @@ public class DocumentStoreImpl implements DocumentStore {
     private MinHeapImpl<Document> leastUsedDocs = new MinHeapImpl();
     private int docCount = 0;
     private int docBytesAmount = 0;
+    public DocumentStoreImpl(File baseDir){
+        PersistenceManagerImpl<URI,Document> pm = new PersistenceManagerImpl<>(baseDir);
+        docStoreBTree.setPersistenceManager(pm);
+    }
     /**
      * @param input the document being put
      * @param uri unique identifier for the document

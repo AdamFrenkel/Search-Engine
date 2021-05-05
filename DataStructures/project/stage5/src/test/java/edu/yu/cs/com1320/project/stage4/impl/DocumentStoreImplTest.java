@@ -93,7 +93,7 @@ public class DocumentStoreImplTest {
         System.out.println("txt4 bytes = " + txt4.getBytes().length);
         System.out.println("txt5 bytes = " + txt5.getBytes().length);
         System.out.println("txt6 bytes = " + txt6.getBytes().length);
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -175,7 +175,7 @@ public class DocumentStoreImplTest {
         System.out.println("txt4 bytes = " + txt4.getBytes().length);
         System.out.println("txt5 bytes = " + txt5.getBytes().length);
         System.out.println("txt6 bytes = " + txt6.getBytes().length);
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -227,7 +227,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testThatProperlyManageStorageBasic() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.setMaxDocumentCount(2);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
@@ -340,7 +340,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void basicSearchAndOrganizationTest() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -353,7 +353,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void basicSearchDeleteTest() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -389,7 +389,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void basicPutOverwriteTest() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         assertEquals(2, store.search("pizza").size());
@@ -398,7 +398,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testDeleteAndDeleteAll() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -415,7 +415,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testUndoNoArgs() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -431,7 +431,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testUndoWithArgs() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()),this.uri3, DocumentStore.DocumentFormat.TXT);
@@ -443,7 +443,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testUndoCommandSet() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         assertEquals(2, store.deleteAll("pizza").size());
@@ -462,7 +462,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testUndoCommandSet2() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.deleteAll("pizza");
@@ -485,7 +485,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void removeCommandSet() throws IOException {
-        DocumentStore store = new DocumentStoreImpl();
+        DocumentStore store = new DocumentStoreImpl(null);
         store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
         store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
         store.deleteAll("pizza");
@@ -541,7 +541,7 @@ public class DocumentStoreImplTest {
         for (int i = 0; i < 7; i++) {
             docArray2[i+14] = new DocumentImpl(uriArray2[i], stringArray2[i+14]);
         }
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         try {
             int testa1 = documentStore.putDocument(new ByteArrayInputStream(stringArray2[0].getBytes()), uriArray2[0], DocumentStore.DocumentFormat.TXT);
             int testa2 = documentStore.putDocument(new ByteArrayInputStream(stringArray2[1].getBytes()), uriArray2[1], DocumentStore.DocumentFormat.TXT);
@@ -654,7 +654,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testStackUndo() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1);
         ByteArrayInputStream stream11 = new ByteArrayInputStream(array1);
@@ -673,7 +673,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStackUndoUri() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1); ByteArrayInputStream stream11 = new ByteArrayInputStream(array1);
         URI uri1 = new URI("1");
@@ -694,7 +694,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStackUriPutOverwrite() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1); ByteArrayInputStream stream11 = new ByteArrayInputStream(array1);
         URI uri = new URI("1");
@@ -713,7 +713,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStackUriDeleteOverwrite() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1); ByteArrayInputStream stream11 = new ByteArrayInputStream(array1);
         URI uri = new URI("1");
@@ -738,7 +738,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStackUriDeleteOverwriteNoParams() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1); ByteArrayInputStream stream11 = new ByteArrayInputStream(array1);
         URI uri = new URI("1");
@@ -763,7 +763,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStackUriDeleteOverwriteMultipleDocs() throws IOException, URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1";
         byte[] array1 = str1.getBytes();
         ByteArrayInputStream stream1 = new ByteArrayInputStream(array1);
@@ -801,7 +801,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void undoTest2() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
 
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
@@ -829,7 +829,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testThrowsException() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         boolean test = false;
         try {
             store.undo();
@@ -854,7 +854,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testPointlessDeleteEmptyUndo() throws URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         URI uri = new URI("Pizza");
         assertFalse(store.deleteDocument(uri));
         store.undo();
@@ -862,14 +862,14 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testPointlessDeleteFullUndo() throws URISyntaxException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         URI uri = new URI("Pizza");
         assertFalse(store.deleteDocument(uri));
         store.undo(uri);
     }
     @Test
     public void testPointlessPutEmptyUndo() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1"; byte[] array1 = str1.getBytes();
         URI uri = new URI("1");
         assertEquals(0, store.putDocument(null, uri, DocumentStore.DocumentFormat.TXT));
@@ -877,7 +877,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testPointlessPutFullUndo() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str1 = "1";
         URI uri = new URI("1");
         assertEquals(0, store.putDocument(null, uri, DocumentStore.DocumentFormat.TXT));
@@ -896,7 +896,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void undoTest() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         Boolean test = false;
         try {
             documentStore.undo();
@@ -933,7 +933,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testUndoSpecificUri() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
 
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
@@ -1009,7 +1009,7 @@ public class DocumentStoreImplTest {
         InputStream targetStream10 = new ByteArrayInputStream(initialString.getBytes());
 
 
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
 
         String byteTxt = "https://www.HashTableImplByte.org/";
         String stringTxt = "https://www.HashTableImplString.org/";
@@ -1337,7 +1337,7 @@ public class DocumentStoreImplTest {
 //
 //    }
     public void testPutNullDeletion2() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1375,7 +1375,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testSimplePutValues2() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1401,7 +1401,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testCollisionPutValues2() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1444,7 +1444,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void addNewToStore() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str = "Hello";
         byte[] array = str.getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream(array);
@@ -1456,7 +1456,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void addOldToStore() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str = "Hello";
         byte[] array = str.getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream(array);
@@ -1473,7 +1473,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void TestDeleteDocument() throws URISyntaxException, IOException {
-        DocumentStoreImpl store = new DocumentStoreImpl();
+        DocumentStoreImpl store = new DocumentStoreImpl(null);
         String str = "Hello";
         byte[] array = str.getBytes();
         ByteArrayInputStream stream = new ByteArrayInputStream(array);
@@ -1502,7 +1502,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testPutDocumentStoreAsText2() {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1538,7 +1538,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testPutDocumentStoreAsBinary2() {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1738,7 +1738,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testPutDocumentStoreAsText() {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1775,7 +1775,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testPutDocumentStoreAsBinary() {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -1829,7 +1829,7 @@ public class DocumentStoreImplTest {
         for (int i = 0; i < 7; i++) {
             docArray[i + 14] = new DocumentImpl(uriArray[i], stringArray[i + 14]);
         }
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         try {
             int testa1 = documentStore.putDocument(new ByteArrayInputStream(stringArray[0].getBytes()), uriArray[0], DocumentStore.DocumentFormat.TXT);
             int testa2 = documentStore.putDocument(new ByteArrayInputStream(stringArray[1].getBytes()), uriArray[1], DocumentStore.DocumentFormat.TXT);
@@ -1913,7 +1913,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testDelete() {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         for (int i = 0; i < 21; i++) {
             uriArray[i] = URI.create("www.google" + i + ".com");
         }
@@ -2012,7 +2012,7 @@ public class DocumentStoreImplTest {
         InputStream targetStream10 = new ByteArrayInputStream(initialString.getBytes());
 
 
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
 
         String byteTxt = "https://www.HashTableImplByte.org/";
         String stringTxt = "https://www.HashTableImplString.org/";
@@ -2260,7 +2260,7 @@ public class DocumentStoreImplTest {
 
     @Test
     public void testPutNullDeletion() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -2298,7 +2298,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testSimplePutValues() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";
@@ -2324,7 +2324,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testCollisionPutValues() throws IOException {
-        DocumentStore documentStore = new DocumentStoreImpl();
+        DocumentStore documentStore = new DocumentStoreImpl(null);
         String string1 = "It was a dark and stormy night";
         String string2 = "It was the best of times, it was the worst of times";
         String string3 = "It was a bright cold day in April, and the clocks were striking thirteen";

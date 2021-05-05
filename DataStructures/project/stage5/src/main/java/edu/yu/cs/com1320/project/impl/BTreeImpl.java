@@ -2,6 +2,7 @@ package edu.yu.cs.com1320.project.impl;
 
 import edu.yu.cs.com1320.project.BTree;
 import edu.yu.cs.com1320.project.stage5.PersistenceManager;
+import edu.yu.cs.com1320.project.stage5.impl.PersistenceManagerImpl;
 
 import java.util.Arrays;
 
@@ -44,6 +45,7 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
     private BTreeImpl.Node leftMostExternalNode;
     private int height; //height of the B-tree
     private int n; //number of key-value pairs in the B-tree
+    private PersistenceManager<Key,Value> pm;
 
     //B-tree node data type
     private static final class Node
@@ -206,7 +208,7 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
     {
         if (key == null)
         {
-            throw new IllegalArgumentException("argument key to put() is null");
+            throw new IllegalArgumentException("argument \"key\" to put() is null");
         }
         //if the key already exists in the b-tree, simply replace the value
         BTreeImpl.Entry alreadyThere = this.get(this.root, key, this.height);
@@ -346,11 +348,27 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
 
     @Override
     public void moveToDisk(Key k) throws Exception {
-
+        if(k == null){
+            throw new IllegalArgumentException("key is null in move to disk.");
+        }
+        Value v = this.get(k);
+        if(v != null){
+            BTreeImpl.Entry entry = this.get(this.root, k, this.height);
+            if(entry != null)
+            {
+                entry.val = k;
+            }
+            pm.serialize(k,v);
+        } else{
+            throw new IllegalArgumentException("key isn't in btree - can't move to disk!");
+        }
     }
 
     @Override
     public void setPersistenceManager(PersistenceManager<Key, Value> pm) {
-
+        if(pm == null){
+            throw new IllegalArgumentException("pm is null in set pm");
+        }
+        this.pm = pm;
     }
 }

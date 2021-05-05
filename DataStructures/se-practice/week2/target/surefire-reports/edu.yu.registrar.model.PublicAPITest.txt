@@ -1,0 +1,28 @@
+-------------------------------------------------------------------------------
+Test set: edu.yu.registrar.model.PublicAPITest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 4, Errors: 2, Skipped: 0, Time elapsed: 0.093 s <<< FAILURE! - in edu.yu.registrar.model.PublicAPITest
+edu.yu.registrar.model.PublicAPITest.testGetGrade  Time elapsed: 0.035 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <100.0> but was: <0.0>
+	at edu.yu.registrar.model.PublicAPITest.testGetGrade(PublicAPITest.java:165)
+
+edu.yu.registrar.model.PublicAPITest.testRegisterForClass  Time elapsed: 0.003 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at edu.yu.registrar.model.PublicAPITest.testRegisterForClass(PublicAPITest.java:47)
+
+edu.yu.registrar.model.PublicAPITest.testSeachForMajor  Time elapsed: 0.003 s  <<< ERROR!
+java.lang.NullPointerException
+	at edu.yu.registrar.model.PublicAPITest.testSeachForMajor(PublicAPITest.java:99)
+
+edu.yu.registrar.model.PublicAPITest.testSearchForClassOffering  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.NullPointerException
+	at edu.yu.registrar.model.PublicAPITest.testSearchForClassOffering(PublicAPITest.java:79)
+
+edu.yu.registrar.model.PublicAPITest.testCreateClassOffering  Time elapsed: 0.002 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at edu.yu.registrar.model.PublicAPITest.testCreateClassOffering(PublicAPITest.java:67)
+
+edu.yu.registrar.model.PublicAPITest.testGiveGrade  Time elapsed: 0.002 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <-1.0> but was: <0.0>
+	at edu.yu.registrar.model.PublicAPITest.testGiveGrade(PublicAPITest.java:151)
+

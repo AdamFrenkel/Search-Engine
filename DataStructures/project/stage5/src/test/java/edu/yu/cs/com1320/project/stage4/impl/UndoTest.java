@@ -33,14 +33,14 @@ public class UndoTest {
     private String txt4;
 
     private DocumentStoreImpl createStoreAndPutOne() throws IOException {
-        DocumentStoreImpl dsi = new DocumentStoreImpl();
+        DocumentStoreImpl dsi = new DocumentStoreImpl(null);
         ByteArrayInputStream bas1 = new ByteArrayInputStream(this.txt1.getBytes());
         dsi.putDocument(bas1,this.uri1, DocumentStore.DocumentFormat.TXT);
         return dsi;
     }
 
     private DocumentStoreImpl createStoreAndPutAll() throws IOException {
-        DocumentStoreImpl dsi = new DocumentStoreImpl();
+        DocumentStoreImpl dsi = new DocumentStoreImpl(null);
         //doc1
         ByteArrayInputStream bas = new ByteArrayInputStream(this.txt1.getBytes());
         dsi.putDocument(bas,this.uri1, DocumentStore.DocumentFormat.TXT);
