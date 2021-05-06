@@ -228,7 +228,16 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
         BTreeImpl.Entry alreadyThere = this.get(this.root, key, this.height);
         if(alreadyThere != null)
         {
-            Value returnVal = (Value) alreadyThere.val;
+            Value returnVal = null;
+            if(!(alreadyThere.valIsURI)) {
+                returnVal = (Value) alreadyThere.val;
+            }else{
+                try {
+                    returnVal = pm.deserialize((Key)alreadyThere.val);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             alreadyThere.val = val;
             return returnVal;
         }

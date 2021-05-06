@@ -83,10 +83,10 @@ public class DocumentStoreImpl implements DocumentStore {
     private void ensureHaveEnoughRoom(URI uri, byte[] newBD) {
         int lengthOfBdGettingReplaced = 0;
         Document doc2 = docStoreBTree.get(uri);
-        if(urisOnDisc.contains(uri)){
-            this.bringBack(doc2);
-            urisOnDisc.remove(uri);
-        }
+//        if(urisOnDisc.contains(uri)){
+//            this.bringBack(doc2);
+//            urisOnDisc.remove(uri);
+//        }
         if(doc2 != null){
             if(doc2.getDocumentTxt() != null) {
                 lengthOfBdGettingReplaced = doc2.getDocumentTxt().getBytes().length;
@@ -101,10 +101,10 @@ public class DocumentStoreImpl implements DocumentStore {
                 DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
                 URI uri3 = leastUsedDoc.getKey();
                 Document doc3 = docStoreBTree.get(leastUsedDoc.getKey()); //I do see potential danger in constantly getting the least used doc and
-                if(urisOnDisc.contains(uri3)){
-                    this.bringBack(doc3);
-                    urisOnDisc.remove(uri3);
-                }
+//                if(urisOnDisc.contains(uri3)){
+//                    this.bringBack(doc3);
+//                    urisOnDisc.remove(uri3);
+//                }
                 if (doc3 == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
                     haventFoundDocInStore = false;
                     URI uriToDelete = leastUsedDoc.getKey();
@@ -112,6 +112,10 @@ public class DocumentStoreImpl implements DocumentStore {
                         throw new IllegalArgumentException("Tried to undo a null URI");
                     }
                     Document doc = docStoreBTree.get(uriToDelete);
+//                    if(urisOnDisc.contains(uriToDelete)){
+//                        this.bringBack(doc);
+//                        urisOnDisc.remove(uriToDelete);
+//                    }
                     try{
                         docStoreBTree.moveToDisk(uriToDelete);
                         urisOnDisc.add(uriToDelete);
@@ -328,6 +332,10 @@ public class DocumentStoreImpl implements DocumentStore {
             throw new IllegalArgumentException("Tried to get a null URI");
         }
         Document returnDoc = (Document) docStoreBTree.get(uri);
+        if(urisOnDisc.contains(uri)){
+            this.bringBack(returnDoc);
+            urisOnDisc.remove(uri);
+        }
         if(returnDoc != null) {
             returnDoc.setLastUseTime(System.nanoTime());
             leastUsedDocs.reHeapify(returnDoc);
@@ -651,7 +659,13 @@ public class DocumentStoreImpl implements DocumentStore {
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
                 DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
-                if (docStoreBTree.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
+                URI uri2 = leastUsedDoc.getKey();
+                Document doc2 = docStoreBTree.get(uri2);
+//                if(urisOnDisc.contains(uri2)){
+//                    this.bringBack(doc2);
+//                    urisOnDisc.remove(uri2);
+//                }
+                if (doc2 == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
                     haventFoundDocInStore = false;
                     URI uriToDelete = leastUsedDoc.getKey();
                     if(uriToDelete == null){

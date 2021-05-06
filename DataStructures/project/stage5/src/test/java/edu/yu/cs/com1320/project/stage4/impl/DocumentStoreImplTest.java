@@ -18,12 +18,71 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DocumentStoreImplTest {
+
+    //my stage 5 tests
+    @Test
+    public void testStage5() throws IOException {
+        DocumentStore store = new DocumentStoreImpl(null);
+        store.setMaxDocumentCount(2);
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+        String fileNameUri1 = System.getProperty("user.dir") + uri1.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri1 + ".json")));
+        store.getDocument(uri1);
+        boolean pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        }catch (NoSuchFileException n){
+            pass = true;
+        }
+        assertTrue(pass);
+
+//        assertNull(store.getDocument(uri1));
+//        assertNotNull(store.getDocument(uri2));
+//        assertNotNull(store.getDocument(uri3));
+//        store.setMaxDocumentCount(1);
+//        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
+//        assertNotNull(store.getDocument(uri1));
+//        assertNull(store.getDocument(uri2));
+//        assertNull(store.getDocument(uri3));
+//        store.setMaxDocumentCount(3);
+//        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+//        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+//        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+//        store.setMaxDocumentBytes(67); //i.e. should only be able to fit two docs
+//        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+//        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+//        assertNull(store.getDocument(uri1));
+//        assertNotNull(store.getDocument(uri2));
+//        assertNotNull(store.getDocument(uri3));
+//        store.getDocument(uri2); //this updates doc2's time, so doesn't get kicked out
+//        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
+//        assertNotNull(store.getDocument(uri1));
+//        assertNotNull(store.getDocument(uri2));
+//        assertNull(store.getDocument(uri3));
+//        store.setMaxDocumentBytes(38);
+//        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+//        assertNull(store.getDocument(uri1));
+//        assertNull(store.getDocument(uri2));
+//        assertNotNull(store.getDocument(uri3));
+//        store.setMaxDocumentBytes(105);
+//        store.setMaxDocumentCount(2);
+//        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
+//        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+//        assertNotNull(store.getDocument(uri1));
+//        assertNotNull(store.getDocument(uri2));
+//        assertNull(store.getDocument(uri3));
+    }
 
     //my Stage 4 Tests
     //variables to hold possible values for doc1
