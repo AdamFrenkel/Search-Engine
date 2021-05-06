@@ -21,7 +21,7 @@ public class PersistenceManagerImplTest {
 
     {
         try {
-            uri1 = new URI("http://www.yu.edu/documents/extra3/doc10");
+            uri1 = new URI("http://www.yu.edu/documents/extra3/tester/tester2/doc10");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -34,24 +34,29 @@ public class PersistenceManagerImplTest {
     }
     //uri1 = new URI("http://edu.yu.cs/com1320/project/doc1");
     private String txt4 = "This is the 7th 7th doc, and it's here to stay!";
+    PersistenceManagerImpl pm = new PersistenceManagerImpl(null);
     //variables to hold possible values for doc2
     @Test
-    public void testBasic(){
+    public void testSerealize(){
         Document document1 = new DocumentImpl(uri4, txt4);
-        PersistenceManagerImpl pm = new PersistenceManagerImpl(null);
         try {
             pm.serialize(uri4, document1);
         } catch (IOException e) {
             e.printStackTrace();
         }
+       // System.out.println("og array:" + Arrays.toString(array1));
         try {
-            pm.deserialize(uri4);
+            pm.serialize(uri1, binaryDoc);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.println("og array:" + Arrays.toString(array1));
+
+
+    }
+    @Test
+    public void testDeserealize(){
         try {
-            pm.serialize(uri1, binaryDoc);
+            pm.deserialize(uri4);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,8 +65,7 @@ public class PersistenceManagerImplTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
 
 }

@@ -4,6 +4,7 @@ import edu.yu.cs.com1320.project.BTree;
 import edu.yu.cs.com1320.project.stage5.PersistenceManager;
 import edu.yu.cs.com1320.project.stage5.impl.PersistenceManagerImpl;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /******************************************************************************
@@ -92,6 +93,7 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
         private Comparable key;
         private Object val;
         private BTreeImpl.Node child;
+        private boolean valIsURI;
 
         public Entry(Comparable key, Object val, BTreeImpl.Node child)
         {
@@ -149,7 +151,19 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
         BTreeImpl.Entry entry = this.get(this.root, key, this.height);
         if(entry != null)
         {
-            return (Value)entry.val;
+            Value val = null;
+            if(!(entry.valIsURI)) {
+                return (Value) entry.val;
+            }else{
+                try {
+                    val= pm.deserialize((Key)entry.val);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            entry.val =val;
+            entry.valIsURI = false;
+            return val;
         }
         return null;
     }
@@ -356,7 +370,9 @@ public class BTreeImpl<Key extends Comparable<Key>, Value> implements BTree<Key,
             BTreeImpl.Entry entry = this.get(this.root, k, this.height);
             if(entry != null)
             {
-                entry.val = k;
+                entry.val = k; //making the uri point to the uri???
+                entry.valIsURI = true;
+
             }
             pm.serialize(k,v);
         } else{

@@ -91,15 +91,17 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
 //            if(json.endsWith("\"")){
 //                json = json.substring(0,json.length()-1);
 //            }
-            System.out.println(json);
+          //  System.out.println(json);
             json = json.replaceAll("\\\\n","");
             json = json.replaceAll("\\\\\"","");
             json = json.replaceAll("\"","");
-            System.out.println(json);
+           // System.out.println(json);
             //Map<String,Integer> map = new HashMap<>();
             Type type1 = new TypeToken<Map<String, String>>(){}.getType();
             Map<String, Integer> myMap = gson.fromJson(json, type1);
             doc.setWordMap(myMap);
+
+
 //            Map<String,Integer> wordWap = new HashMap<>();
 //            Type type2 = wordWap{}.getType();
           //  Type type2 =new TypeToken<Map<String,Integer>>{}.getT
@@ -132,7 +134,7 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
         //System.out.println(stringUri.substring(7) + ".json");
        // String dir = System.getProperty("user.dir");
         String fileName = dir + uri.getRawSchemeSpecificPart();
-       // System.out.println("filename: " + fileName);
+     //   System.out.println("filename: " + fileName);
         String directory = fileName.substring(0,fileName.lastIndexOf("/"));
        // System.out.println("dir: " + directory);
         File file = new File(directory);
@@ -199,10 +201,15 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
         URI uri = (URI) key;
         String fileName = dir + uri.getRawSchemeSpecificPart();
         String directory = fileName.substring(0,fileName.lastIndexOf("/"));
-        byte[] content = Files.readAllBytes(Paths.get(fileName + ".json"));
-        String docInJson = new String(content);
-        System.out.println("what deserializeing will return: " + gson.fromJson(docInJson,DocumentImpl.class));
-
+        File tempFile = new File(fileName + ".json");
+        byte[] content;
+        if(tempFile.exists()) {
+            content = Files.readAllBytes(Paths.get(fileName + ".json"));
+            String docInJson = new String(content);
+            Value returnVal = (Value) gson.fromJson(docInJson, DocumentImpl.class);
+            this.delete(key);
+            return returnVal;
+        }
        // String has a constructor that takes in a byte[]
 
        // FileWriter fileWriter = new FileWriter(fileName +".json");
@@ -231,6 +238,17 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
 
     @Override
     public boolean delete(Key key) throws IOException {
+        URI uri = (URI) key;
+        String fileName = dir + uri.getRawSchemeSpecificPart();
+        File file = new File(fileName+".json");
+        boolean moreToDelete = file.delete();
+        File parentFile = file;
+        while(moreToDelete){
+            parentFile = parentFile.getParentFile();
+            if(!parentFile.delete()){
+                moreToDelete = false;
+            }
+        }
         return false;
     }
 }

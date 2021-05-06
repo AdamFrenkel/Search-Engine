@@ -10,6 +10,7 @@ import edu.yu.cs.com1320.project.stage5.Document;
 import edu.yu.cs.com1320.project.stage5.DocumentStore;
 import edu.yu.cs.com1320.project.stage5.PersistenceManager;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ public class DocumentStoreImpl implements DocumentStore {
     private MinHeapImpl<Document> leastUsedDocs = new MinHeapImpl();
     private int docCount = 0;
     private int docBytesAmount = 0;
+    private Set<URI> urisOnDisc = new HashSet<>();
     public DocumentStoreImpl(File baseDir){
         PersistenceManagerImpl<URI,Document> pm = new PersistenceManagerImpl<>(baseDir);
         docStoreBTree.setPersistenceManager(pm);
@@ -80,19 +82,30 @@ public class DocumentStoreImpl implements DocumentStore {
     }
     private void ensureHaveEnoughRoom(URI uri, byte[] newBD) {
         int lengthOfBdGettingReplaced = 0;
-        if(docStoreBTree.get(uri) != null){
-            if(docStoreBTree.get(uri).getDocumentTxt() != null) {
-                lengthOfBdGettingReplaced = docStoreBTree.get(uri).getDocumentTxt().getBytes().length;
+        Document doc2 = docStoreBTree.get(uri);
+        if(urisOnDisc.contains(uri)){
+            this.bringBack(doc2);
+            urisOnDisc.remove(uri);
+        }
+        if(doc2 != null){
+            if(doc2.getDocumentTxt() != null) {
+                lengthOfBdGettingReplaced = doc2.getDocumentTxt().getBytes().length;
             }else{
-                lengthOfBdGettingReplaced = docStoreBTree.get(uri).getDocumentBinaryData().length;
+                lengthOfBdGettingReplaced = doc2.getDocumentBinaryData().length;
             }
         }
         //This if statement is checking to see if we have to remove a doc, before placing a new one in.  The docStoreBTree piece is checking if this is just a replace in which case we don't need to worry about going over doc limit
-        while((maxDocCountBoolean && docCount + 1 > maxDocumentCount && docStoreBTree.get(uri) == null) || (maxDocBytesBoolean && (docBytesAmount + newBD.length - lengthOfBdGettingReplaced) > maxDocumentBytes)){
+        while((maxDocCountBoolean && docCount + 1 > maxDocumentCount && doc2 == null) || (maxDocBytesBoolean && (docBytesAmount + newBD.length - lengthOfBdGettingReplaced) > maxDocumentBytes)){
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
                 DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
-                if (docStoreBTree.get(leastUsedDoc.getKey()) == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
+                URI uri3 = leastUsedDoc.getKey();
+                Document doc3 = docStoreBTree.get(leastUsedDoc.getKey()); //I do see potential danger in constantly getting the least used doc and
+                if(urisOnDisc.contains(uri3)){
+                    this.bringBack(doc3);
+                    urisOnDisc.remove(uri3);
+                }
+                if (doc3 == leastUsedDoc) { //this means that the doc is in the docStore and not just in leastUsedDoc through som mistake somewhere
                     haventFoundDocInStore = false;
                     URI uriToDelete = leastUsedDoc.getKey();
                     if(uriToDelete == null){
@@ -101,6 +114,7 @@ public class DocumentStoreImpl implements DocumentStore {
                     Document doc = docStoreBTree.get(uriToDelete);
                     try{
                         docStoreBTree.moveToDisk(uriToDelete);
+                        urisOnDisc.add(uriToDelete);
                     }catch(Exception e){
                         throw new IllegalArgumentException("I don't know what happened- but apparently there can be an exception called when moving to disc, but it's not really an illeagal argument one? GL");
                     }
@@ -724,6 +738,27 @@ public class DocumentStoreImpl implements DocumentStore {
 
         while (holderStack.size()>0){
             commandStack.push((Undoable) holderStack.pop());
+        }
+    }
+    private void bringBack(Document doc) {
+        URI uri = doc.getKey();
+        String txt;
+        byte[] bD;
+        DocumentStore.DocumentFormat format;
+        ByteArrayInputStream stream;
+        if (doc.getDocumentTxt() != null) {
+            txt = doc.getDocumentTxt();
+            format = DocumentFormat.TXT;
+            stream = new ByteArrayInputStream(txt.getBytes());
+        }else{
+            bD =doc.getDocumentBinaryData();
+            format = DocumentFormat.BINARY;
+            stream = new ByteArrayInputStream(bD);
+        }
+        try {
+            this.putDocument(stream,uri,format);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
