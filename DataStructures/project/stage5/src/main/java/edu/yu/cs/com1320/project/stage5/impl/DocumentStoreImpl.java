@@ -210,8 +210,10 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount -= docReturn.getDocumentBinaryData().length;
             }
             docReturn.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(docReturn);
-            leastUsedDocs.remove();
+            if(!urisOnDisc.contains(docReturn.getKey())) {
+                leastUsedDocs.reHeapify(docReturn);
+                leastUsedDocs.remove();
+            }
             return docReturn.hashCode();
         }
     }
@@ -373,8 +375,10 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount -= doc.getDocumentBinaryData().length;
             }
             doc.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(doc);
-            leastUsedDocs.remove();
+            if(!urisOnDisc.contains(docURI)) {
+                leastUsedDocs.reHeapify(doc);
+                leastUsedDocs.remove();
+            }
 
         }
         //Stage 2 stuff
@@ -528,8 +532,16 @@ public class DocumentStoreImpl implements DocumentStore {
             }
         }
         for (Document d : returnList){
-            d.setLastUseTime(equivalentTimeToSetAllDocsTo);
-            leastUsedDocs.reHeapify(d);
+            /*
+            For now putting in a simple fix, but doesn't solve the underlying question of what
+            to do when search for multiple docs that need to bring back to the store, but there
+            isn't enough room for all them. (Referring to the if statement)
+            - Shmuel Newmark says this is correct (piazza)
+             */
+            if(!urisOnDisc.contains(d.getKey())) {
+                d.setLastUseTime(equivalentTimeToSetAllDocsTo);
+                leastUsedDocs.reHeapify(d);
+            }
         }
         return returnList;
     }
@@ -583,8 +595,16 @@ public class DocumentStoreImpl implements DocumentStore {
             }
         }
         for (Document d : returnList){
-            d.setLastUseTime(equivalentTimeToSetAllDocsTo);
-            leastUsedDocs.reHeapify(d);
+            /*
+            For now putting in a simple fix, but doesn't solve the underlying question of what
+            to do when search for multiple docs that need to bring back to the store, but there
+            isn't enough room for all them. (Referring to the if statement)
+            - Shmuel Newmark says this is correct (piazza)
+             */
+            if(!urisOnDisc.contains(d.getKey())) {
+                d.setLastUseTime(equivalentTimeToSetAllDocsTo);
+                leastUsedDocs.reHeapify(d);
+            }
         }
         return returnList;
     }
@@ -611,8 +631,10 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount -= d.getDocumentBinaryData().length;
             }
             d.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(d);
-            leastUsedDocs.remove();
+            if(!urisOnDisc.contains(d.getKey())) {
+                leastUsedDocs.reHeapify(d);
+                leastUsedDocs.remove();
+            }
             //These next few lines are need for undo purposes
             if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
                 StackImpl<DocumentImpl> newStack = new StackImpl<>();
@@ -653,8 +675,10 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount -= d.getDocumentBinaryData().length;
             }
             d.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(d);
-            leastUsedDocs.remove();
+            if(!urisOnDisc.contains(d.getKey())) {
+                leastUsedDocs.reHeapify(d);
+                leastUsedDocs.remove();
+            }
             //These next few lines are need for undo purposes
             if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
                 StackImpl<DocumentImpl> newStack = new StackImpl<>();

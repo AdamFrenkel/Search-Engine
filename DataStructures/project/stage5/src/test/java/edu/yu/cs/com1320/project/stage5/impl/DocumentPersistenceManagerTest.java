@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.junit.Assert.*;
+
 public class DocumentPersistenceManagerTest {
     private URI uri4;
     String str1 = "1";
@@ -37,6 +39,8 @@ public class DocumentPersistenceManagerTest {
         Document document1 = new DocumentImpl(uri4, txt4);
         try {
             pm.serialize(uri4, document1);
+            assertTrue(pm.delete(uri4));
+            pm.serialize(uri4, document1);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,6 +62,11 @@ public class DocumentPersistenceManagerTest {
         }
         try {
             pm.deserialize(uri1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            assertFalse(pm.delete(uri4));
         } catch (IOException e) {
             e.printStackTrace();
         }

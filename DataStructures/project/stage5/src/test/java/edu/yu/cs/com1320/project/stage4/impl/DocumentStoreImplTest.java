@@ -30,6 +30,28 @@ public class DocumentStoreImplTest {
 
     //my stage 5 tests
     @Test
+    public void testStage5Basic2() throws IOException {
+        DocumentStore store = new DocumentStoreImpl(null);
+        store.setMaxDocumentCount(1);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+        String fileNameUri2 = System.getProperty("user.dir") + uri2.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
+        assertEquals(2,store.deleteAllWithPrefix("P").size());
+        boolean pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
+        }catch (NoSuchFileException n){
+            pass = true;
+        }
+        assertTrue(pass);
+
+
+//        private String txt1 = "Apple Apple Pizza Fish Pie Pizza Apple";
+//        private String txt2 = "Pizza Pizza Pizza Pizza Pizza";
+//        private String txt3 = "Penguin Park Piccalo Pants Pain Possum";
+    }
+    @Test
     public void testStage5Basic() throws IOException {
         DocumentStore store = new DocumentStoreImpl(null);
         store.setMaxDocumentCount(2);
@@ -53,6 +75,10 @@ public class DocumentStoreImplTest {
         store.setMaxDocumentCount(1);
         assertEquals(1,store.searchByPrefix("Apple").size());
         assertEquals(2,store.searchByPrefix("Pizza").size());
+        assertTrue(store.deleteDocument(uri2));
+        assertEquals(1,store.searchByPrefix("Pizza").size());
+
+
 //        private String txt1 = "Apple Apple Pizza Fish Pie Pizza Apple";
 //        private String txt2 = "Pizza Pizza Pizza Pizza Pizza";
 //        private URI uri3;

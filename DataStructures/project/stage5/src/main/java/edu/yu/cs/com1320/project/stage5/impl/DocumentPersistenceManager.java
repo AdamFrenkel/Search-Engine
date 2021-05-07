@@ -97,7 +97,7 @@ public class DocumentPersistenceManager implements PersistenceManager<URI, Docum
             json = json.replaceAll("\"","");
            // System.out.println(json);
             //Map<String,Integer> map = new HashMap<>();
-            Type type1 = new TypeToken<Map<String, String>>(){}.getType();
+            Type type1 = new TypeToken<Map<String, Integer>>(){}.getType();
             Map<String, Integer> myMap = gson.fromJson(json, type1);
             doc.setWordMap(myMap);
 
@@ -119,6 +119,9 @@ public class DocumentPersistenceManager implements PersistenceManager<URI, Docum
 
     @Override
     public void serialize(URI key, Document val) throws IOException {
+        if(key == null || val == null){
+            throw new IllegalArgumentException("null in serealize");
+        }
         DocumentImpl doc = (DocumentImpl) val;
         //JsonObject json = new JsonObject();
 //        new GSonBuilder().registerTypeAdapter(Document.class, DocSerializer)
@@ -238,10 +241,15 @@ public class DocumentPersistenceManager implements PersistenceManager<URI, Docum
 
     @Override
     public boolean delete(URI key) throws IOException {
+        if(key == null){
+            throw new IllegalArgumentException("null in delete");
+        }
+        boolean anythingDeleted = false;
         URI uri = (URI) key;
         String fileName = dir + uri.getRawSchemeSpecificPart();
         File file = new File(fileName+".json");
         boolean moreToDelete = file.delete();
+        anythingDeleted = moreToDelete;
         File parentFile = file;
         while(moreToDelete){
             parentFile = parentFile.getParentFile();
@@ -249,6 +257,6 @@ public class DocumentPersistenceManager implements PersistenceManager<URI, Docum
                 moreToDelete = false;
             }
         }
-        return false;
+        return anythingDeleted;
     }
 }
