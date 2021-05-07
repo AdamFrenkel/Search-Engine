@@ -92,6 +92,61 @@ public class DocumentStoreImplTest {
         assertTrue(pass4);
         assertNotNull(store.getDocument(uri1));
         assertNull(store.getDocument(uri2));
+        store.setMaxDocumentBytes(105);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+        boolean pass5 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        }catch (NoSuchFileException n){
+            pass5 = true;
+        }
+        assertTrue(pass5);
+        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        //currently there should be uri1 on disc and uri2 (w txt5) and uri3 txt3 in memory, but when undo
+        //is called there should be regular uri1 2 and 3 in memory and nothing on disc
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri1 + ".json")));
+        boolean pass6 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
+        }catch (NoSuchFileException n){
+            pass6 = true;
+        }
+        assertTrue(pass6);
+        boolean pass7 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri3 + ".json"));
+        }catch (NoSuchFileException n){
+            pass7 = true;
+        }
+        assertTrue(pass7);
+        assertNotNull(store.getDocument(uri3));
+        assertNotNull(store.getDocument(uri2));
+        store.undo(uri2);
+        boolean pass8 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
+        }catch (NoSuchFileException n){
+            pass8 = true;
+        }
+        assertTrue(pass8);
+        boolean pass9 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri3 + ".json"));
+        }catch (NoSuchFileException n){
+            pass9 = true;
+        }
+        assertTrue(pass9);
+        boolean pass10 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        }catch (NoSuchFileException n){
+            pass10 = true;
+        }
+        assertTrue(pass10);
+        assertNotNull(store.getDocument(uri3));
+        assertNotNull(store.getDocument(uri2));
+        assertNotNull(store.getDocument(uri1));
 
 
     }
