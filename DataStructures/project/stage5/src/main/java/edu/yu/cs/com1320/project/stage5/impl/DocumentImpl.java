@@ -78,8 +78,8 @@ public class DocumentImpl implements Document {
         this.uri = uri;
         this.binaryData = binaryData;
 
-        String string = new String(binaryData);
-        this.addWordsToHtAndSet(string);
+//        String string = new String(binaryData);
+//        this.addWordsToHtAndSet(string);
 
     }
 

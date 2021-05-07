@@ -1,18 +1,14 @@
 package edu.yu.cs.com1320.project.stage5.impl;
 
 import edu.yu.cs.com1320.project.stage5.Document;
-import edu.yu.cs.com1320.project.stage5.DocumentStore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-public class PersistenceManagerImplTest {
+public class DocumentPersistenceManagerTest {
     private URI uri4;
     String str1 = "1";
     byte[] array1 = str1.getBytes();
@@ -28,13 +24,13 @@ public class PersistenceManagerImplTest {
     }
     Document binaryDoc = new DocumentImpl(uri1, stream11.readAllBytes());
     { try {
-        uri4 = new URI("http://www.yu.edu/documents/extra3/doc9");
+        uri4 = new URI("http://www.yu.edu/documents/extra3/tester/tester2/doc9");
     } catch (URISyntaxException e) {
         e.printStackTrace(); }
     }
     //uri1 = new URI("http://edu.yu.cs/com1320/project/doc1");
     private String txt4 = "This is the 7th 7th doc, and it's here to stay!";
-    PersistenceManagerImpl pm = new PersistenceManagerImpl(null);
+    DocumentPersistenceManager pm = new DocumentPersistenceManager(null);
     //variables to hold possible values for doc2
     @Test
     public void testSerealize(){

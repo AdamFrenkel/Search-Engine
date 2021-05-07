@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 //import java.util.HashMap;
 
-public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Key, Value> {
+public class DocumentPersistenceManager implements PersistenceManager<URI, Document> {
     private Gson gson = new GsonBuilder().registerTypeAdapter(DocumentImpl.class, new DocSerializer()).registerTypeAdapter(DocumentImpl.class,new DocDeserializer()).setPrettyPrinting().create();
     private String dir;
-    public PersistenceManagerImpl(File dir){
+    public DocumentPersistenceManager(File dir){
         if (dir!= null) {
             String dirString = dir.toString();
             this.dir = dirString;
@@ -118,7 +118,7 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
     }
 
     @Override
-    public void serialize(Key key, Value val) throws IOException {
+    public void serialize(URI key, Document val) throws IOException {
         DocumentImpl doc = (DocumentImpl) val;
         //JsonObject json = new JsonObject();
 //        new GSonBuilder().registerTypeAdapter(Document.class, DocSerializer)
@@ -197,7 +197,7 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
     }
 
     @Override
-    public Value deserialize(Key key) throws IOException {
+    public Document deserialize(URI key) throws IOException {
         URI uri = (URI) key;
         String fileName = dir + uri.getRawSchemeSpecificPart();
         String directory = fileName.substring(0,fileName.lastIndexOf("/"));
@@ -206,7 +206,7 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
         if(tempFile.exists()) {
             content = Files.readAllBytes(Paths.get(fileName + ".json"));
             String docInJson = new String(content);
-            Value returnVal = (Value) gson.fromJson(docInJson, DocumentImpl.class);
+            Document returnVal = (Document) gson.fromJson(docInJson, DocumentImpl.class);
             this.delete(key);
             return returnVal;
         }
@@ -237,7 +237,7 @@ public class PersistenceManagerImpl<Key, Value> implements PersistenceManager<Ke
     }
 
     @Override
-    public boolean delete(Key key) throws IOException {
+    public boolean delete(URI key) throws IOException {
         URI uri = (URI) key;
         String fileName = dir + uri.getRawSchemeSpecificPart();
         File file = new File(fileName+".json");

@@ -8,7 +8,6 @@ import edu.yu.cs.com1320.project.Undoable;
 import edu.yu.cs.com1320.project.impl.*;
 import edu.yu.cs.com1320.project.stage5.Document;
 import edu.yu.cs.com1320.project.stage5.DocumentStore;
-import edu.yu.cs.com1320.project.stage5.PersistenceManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,7 +24,7 @@ public class DocumentStoreImpl implements DocumentStore {
    // private WrongBTree <URI, Document> docStoreBTree = new WrongBTree<>();
     private Map<URI, StackImpl> deletedDocsHT = new HashMap<>();
     private Map<URI, StackImpl> replacedDocsHT = new HashMap<>(); //This will map uris of the OG doc to the doc repaced by it
-    private TrieImpl<Document> trie = new TrieImpl<>();
+    private TrieImpl<URI> trie = new TrieImpl<>();
     private boolean maxDocCountBoolean = false;
     private boolean maxDocBytesBoolean = false;
     private int maxDocumentCount = Integer.MAX_VALUE;
@@ -35,7 +34,7 @@ public class DocumentStoreImpl implements DocumentStore {
     private int docBytesAmount = 0;
     private Set<URI> urisOnDisc = new HashSet<>();
     public DocumentStoreImpl(File baseDir){
-        PersistenceManagerImpl<URI,Document> pm = new PersistenceManagerImpl<>(baseDir);
+        DocumentPersistenceManager pm = new DocumentPersistenceManager(baseDir);
         docStoreBTree.setPersistenceManager(pm);
     }
     /**
@@ -129,10 +128,10 @@ public class DocumentStoreImpl implements DocumentStore {
 //                    }
                     if(doc != null) {
                         haventFoundDocInStore = false;
-                        Set<String> words = doc.getWords();
-                        for (String w : words) {
-                            trie.delete(w, doc);
-                        }
+//                        Set<String> words = doc.getWords();
+//                        for (String w : words) {
+//                            trie.delete(w, doc);
+//                        }
                         //stage 4 stuff
                         docCount--;
                         if(doc.getDocumentTxt() != null) {
@@ -161,15 +160,17 @@ public class DocumentStoreImpl implements DocumentStore {
     }
     private void putStage3(Document doc, Document docReturn){
         Set<String> words = doc.getWords();
+        URI uriOfDoc = doc.getKey();
         for (String w : words) {
             w = w.replaceAll("[^a-zA-Z0-9\\s]", "");
-            trie.put(w, doc);
+            trie.put(w, uriOfDoc);
         }
         if(docReturn != null){
             Set<String> deletedWords = docReturn.getWords();
+            URI uriOfDocReturn = docReturn.getKey();
             for (String w : deletedWords) {
                 w = w.replaceAll("[^a-zA-Z0-9\\s]", "");
-                trie.delete(w, docReturn);
+                trie.delete(w, uriOfDocReturn);
             }
         }
     }
@@ -232,8 +233,9 @@ public class DocumentStoreImpl implements DocumentStore {
         //new stuff for stage 3
         if(docReturn != null){
             Set<String> words = docReturn.getWords();
+            URI uriOfDocReturn = docReturn.getKey();
             for(String w : words){
-                trie.delete(w, docReturn);
+                trie.delete(w, uriOfDocReturn);
             }
         }
         //stage 2 stuff
@@ -266,8 +268,9 @@ public class DocumentStoreImpl implements DocumentStore {
         DocumentImpl docThatReplaced = (DocumentImpl) docStoreBTree.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
         if(docThatReplaced != null) {
             Set<String> words = docThatReplaced.getWords();
+            URI uriOfDocThatReplaced = docThatReplaced.getKey();
             for (String w : words) {
-                trie.delete(w, docThatReplaced);
+                trie.delete(w, uriOfDocThatReplaced);
             }
             //new for stage 4
             docCount--;
@@ -282,8 +285,9 @@ public class DocumentStoreImpl implements DocumentStore {
         }
         if(docThatWASreplaced != null) {
             Set<String> words = docThatWASreplaced.getWords();
+            URI uriOfDocThatWASreplaced = docThatWASreplaced.getKey();
             for (String w : words) {
-                trie.put(w, docThatWASreplaced);
+                trie.put(w, uriOfDocThatWASreplaced);
             }
             docCount++;
             docBytesAmount += newBdToAdd.length;
@@ -304,8 +308,9 @@ public class DocumentStoreImpl implements DocumentStore {
         //new stuff for stage 3
         if(doc != null) {
             Set<String> words = doc.getWords();
+            URI docURI = doc.getKey();
             for (String w : words) {
-                trie.delete(w, doc);
+                trie.delete(w, docURI);
             }
             //stage 4 stuff
             docCount--;
@@ -356,8 +361,9 @@ public class DocumentStoreImpl implements DocumentStore {
         //new stuff for stage 3
         if(doc != null){
             Set<String> words = doc.getWords();
+            URI docURI = doc.getKey();
             for(String w : words){
-                trie.delete(w, doc);
+                trie.delete(w, docURI);
             }
             //stage 4 stuff
             docCount--;
@@ -408,9 +414,10 @@ public class DocumentStoreImpl implements DocumentStore {
         //new stuff for stage 3
         if(doc != null) {
             Set<String> words = doc.getWords();
+            URI docURI = doc.getKey();
             for (String w : words) {
 
-                trie.put(w, doc);
+                trie.put(w, docURI);
             }
             //new stage 4
             docCount++;
@@ -494,9 +501,11 @@ public class DocumentStoreImpl implements DocumentStore {
     @Override
     public List<Document> search(String keyword) {
         keyword.toLowerCase();
-        Comparator<Document> documentComparator = new Comparator<Document>( ) {
+        Comparator<URI> documentComparator = new Comparator<>( ) {
             @Override
-            public int compare(Document d1, Document d2) {
+            public int compare(URI u1, URI u2) {
+                Document d1 = docStoreBTree.get(u1);
+                Document d2 = docStoreBTree.get(u2);
                 if(d1.wordCount(keyword)< d2.wordCount(keyword)){
                     return 1;
                 }
@@ -508,7 +517,16 @@ public class DocumentStoreImpl implements DocumentStore {
             }
         };
         long equivalentTimeToSetAllDocsTo = System.nanoTime();
-        List<Document> returnList = trie.getAllSorted(keyword,documentComparator); //Forgot how to make comparator
+        List<URI> returnURIList = trie.getAllSorted(keyword,documentComparator); //Forgot how to make comparator
+        List<Document> returnList = new ArrayList<>();
+        for(URI u : returnURIList){
+            Document doc =docStoreBTree.get(u);
+            returnList.add(doc);
+            if(urisOnDisc.contains(u)){
+                this.bringBack(doc);
+                urisOnDisc.remove(u);
+            }
+        }
         for (Document d : returnList){
             d.setLastUseTime(equivalentTimeToSetAllDocsTo);
             leastUsedDocs.reHeapify(d);
@@ -520,9 +538,11 @@ public class DocumentStoreImpl implements DocumentStore {
     public List<Document> searchByPrefix(String keywordPrefix) {
         //long startTime = System.nanoTime();
         String lowerCase = keywordPrefix.toLowerCase();
-        Comparator<Document> documentComparator = new Comparator<Document>( ) {
+        Comparator<URI> documentComparator = new Comparator<>( ) {
             @Override
-            public int compare(Document d1, Document d2) {
+            public int compare(URI u1, URI u2) {
+                Document d1 = docStoreBTree.get(u1);
+                Document d2 = docStoreBTree.get(u2);
                 int d1size = 0;
                 Set<String> d1Words = d1.getWords();
                 for(String w : d1Words){
@@ -552,7 +572,16 @@ public class DocumentStoreImpl implements DocumentStore {
         //for()
         //return returnList;
         long equivalentTimeToSetAllDocsTo = System.nanoTime();
-        List<Document> returnList = trie.getAllWithPrefixSorted(lowerCase, documentComparator);
+        List<URI> returnURIList = trie.getAllWithPrefixSorted(lowerCase, documentComparator);
+        List<Document> returnList = new ArrayList<>();
+        for(URI u : returnURIList){
+            Document doc =docStoreBTree.get(u);
+            returnList.add(doc);
+            if(urisOnDisc.contains(u)){
+                this.bringBack(doc);
+                urisOnDisc.remove(u);
+            }
+        }
         for (Document d : returnList){
             d.setLastUseTime(equivalentTimeToSetAllDocsTo);
             leastUsedDocs.reHeapify(d);
@@ -563,7 +592,11 @@ public class DocumentStoreImpl implements DocumentStore {
     @Override
     public Set<URI> deleteAll(String keyword) {
         keyword = keyword.toLowerCase();
-        Set<Document> deletedDocs = trie.deleteAll(keyword);
+        Set<URI> deletedURIs = trie.deleteAll(keyword);
+        Set<Document> deletedDocs = new HashSet<>();
+        for(URI u : deletedURIs){
+            deletedDocs.add(docStoreBTree.get(u));
+        }
         CommandSet<URI> undoDelAllComands = new CommandSet<>();
         Set<URI> uris = new HashSet<>();
         Boolean areThereAnyDocs = false;
@@ -600,7 +633,12 @@ public class DocumentStoreImpl implements DocumentStore {
     @Override
     public Set<URI> deleteAllWithPrefix(String keywordPrefix) {
         keywordPrefix.toLowerCase();
-        Set<Document> deletedDocs = trie.deleteAllWithPrefix(keywordPrefix);
+        Set<URI> deletedURIs = trie.deleteAllWithPrefix(keywordPrefix);
+        Set<Document> deletedDocs = new HashSet<>();
+        for(URI u : deletedURIs){
+            deletedDocs.add(docStoreBTree.get(u));
+        }
+        //Set<Document> deletedDocs = trie.deleteAllWithPrefix(keywordPrefix);
         CommandSet<URI> undoDelAllPreCommands = new CommandSet<>();
         Set<URI> uris = new HashSet<>();
         Boolean areThereAnyDocs = false;
@@ -629,8 +667,9 @@ public class DocumentStoreImpl implements DocumentStore {
             areThereAnyDocs = true;
             //new stuff for mistake from stage 3(I think)
             Set<String> words = d.getWords();
+            URI uriOfD = d.getKey();
             for(String w : words){
-                trie.delete(w, d);
+                trie.delete(w, uriOfD);
             }
         }
         if(areThereAnyDocs == true) {//have to fix this still
@@ -671,17 +710,23 @@ public class DocumentStoreImpl implements DocumentStore {
                     if(uriToDelete == null){
                         throw new IllegalArgumentException("Tried to undo a null URI");
                     }
-                    Document doc = docStoreBTree.put(uriToDelete, null);
-                    //gets rid of all undos related to this uri BeH
-//                    if(doc == null){
-//                        return false;
+                    Document doc = docStoreBTree.get(uriToDelete);
+//                    if(urisOnDisc.contains(uriToDelete)){
+//                        this.bringBack(doc);
+//                        urisOnDisc.remove(uriToDelete);
 //                    }
+                    try{
+                        docStoreBTree.moveToDisk(uriToDelete);
+                        urisOnDisc.add(uriToDelete);
+                    }catch(Exception e){
+                        throw new IllegalArgumentException("I don't know what happened- but apparently there can be an exception called when moving to disc, but it's not really an illeagal argument one? GL");
+                    }
                     if(doc != null) {
                         haventFoundDocInStore = false;
-                        Set<String> words = doc.getWords();
-                        for (String w : words) {
-                            trie.delete(w, doc);
-                        }
+//                        Set<String> words = doc.getWords();
+//                        for (String w : words) {
+//                            trie.delete(w, doc);
+//                        }
                         //stage 4 stuff
                         docCount--;
                         if(doc.getDocumentTxt() != null) {
@@ -755,24 +800,31 @@ public class DocumentStoreImpl implements DocumentStore {
         }
     }
     private void bringBack(Document doc) {
-        URI uri = doc.getKey();
-        String txt;
-        byte[] bD;
-        DocumentStore.DocumentFormat format;
-        ByteArrayInputStream stream;
-        if (doc.getDocumentTxt() != null) {
-            txt = doc.getDocumentTxt();
-            format = DocumentFormat.TXT;
-            stream = new ByteArrayInputStream(txt.getBytes());
-        }else{
-            bD =doc.getDocumentBinaryData();
-            format = DocumentFormat.BINARY;
-            stream = new ByteArrayInputStream(bD);
-        }
-        try {
-            this.putDocument(stream,uri,format);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        URI uri = doc.getKey();
+//        String txt;
+//        byte[] bD;
+//        DocumentStore.DocumentFormat format;
+//        ByteArrayInputStream stream;
+//        if (doc.getDocumentTxt() != null) {
+//            txt = doc.getDocumentTxt();
+//            format = DocumentFormat.TXT;
+//            stream = new ByteArrayInputStream(txt.getBytes());
+//        }else{
+//            bD =doc.getDocumentBinaryData();
+//            format = DocumentFormat.BINARY;
+//            stream = new ByteArrayInputStream(bD);
+//        }
+//        try {
+//            this.putDocument(stream,uri,format);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        doc.setLastUseTime(System.nanoTime());
+        leastUsedDocs.insert(doc);
+        docStoreBTree.put(doc.getKey(),doc);
+        docCount++;
+        urisOnDisc.remove(doc.getKey());
+        this.ensureHaveEnoughRoom();
+
     }
 }
