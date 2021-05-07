@@ -29,6 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DocumentStoreImplTest {
 
     //my stage 5 tests
+//    @Test
+//    public void testStage5Undo() throws IOException {
+//
+//    }
     @Test
     public void testStage5Basic2() throws IOException {
         DocumentStore store = new DocumentStoreImpl(null);
@@ -45,11 +49,77 @@ public class DocumentStoreImplTest {
             pass = true;
         }
         assertTrue(pass);
+        store.setMaxDocumentCount(3);
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()),this.uri1, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()),this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()),this.uri4, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()),this.uri5, DocumentStore.DocumentFormat.TXT);
+        String fileNameUri1 = System.getProperty("user.dir") + uri1.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri1 + ".json")));
+       // assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
+        String fileNameUri3 = System.getProperty("user.dir") + uri3.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri3 + ".json")));
+        assertEquals(3,store.searchByPrefix("P").size());
+        String fileNameUri4 = System.getProperty("user.dir") + uri4.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri4 + ".json")));
+        String fileNameUri5 = System.getProperty("user.dir") + uri5.getRawSchemeSpecificPart();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri5 + ".json")));
+        boolean pass2 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        }catch (NoSuchFileException n){
+            pass2 = true;
+        }
+        assertTrue(pass2);
+        boolean pass3 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
+        }catch (NoSuchFileException n){
+            pass3 = true;
+        }
+        assertTrue(pass3);
+        boolean pass4 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri3 + ".json"));
+        }catch (NoSuchFileException n){
+            pass4 = true;
+        }
+        assertTrue(pass4);
+        assertEquals(3,store.deleteAllWithPrefix("P").size());
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri4 + ".json")));
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri5 + ".json")));
+//        boolean pass5 = false;
+//        try {
+//            Files.readAllBytes(Paths.get(fileNameUri5 + ".json"));
+//        }catch (NoSuchFileException n){
+//            pass5 = true;
+//        }
+//        assertTrue(pass5);
+//        boolean pass6 = false;
+//        try {
+//            Files.readAllBytes(Paths.get(fileNameUri4 + ".json"));
+//        }catch (NoSuchFileException n){
+//            pass6 = true;
+//        }
+//        assertTrue(pass6);
+        boolean pass7 = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        }catch (NoSuchFileException n){
+            pass7 = true;
+        }
+        assertTrue(pass7);
+
 
 
 //        private String txt1 = "Apple Apple Pizza Fish Pie Pizza Apple";
 //        private String txt2 = "Pizza Pizza Pizza Pizza Pizza";
 //        private String txt3 = "Penguin Park Piccalo Pants Pain Possum";
+//        private String txt4 = "This is the 4th doc, and it's here to stay!";
+//        private String txt5 = "Hello I am the 5th doc, and I'm here to stay!";
+//        private String txt6 = "Penguin Park Piccalo Pants Pain Possum and I'm here to STAY! awawawawawawawawawawawawawawawawawawawawawawaewaeaeaeaesrewarewsewrarewarewserwsercrcxvftvhgdbkjdbnwucbnuhfruynbwxuyfizwmbwfyxnuybnregh byugcnbgyxfrebygxbfrmuyzbvuybmfrbubfvubvexuybmzybmfubvmugbxmnxuvbrvnubnruzbuxyrewyhrfmuyzhbnuycbyftxbjnuynbxchgwybnxnbergrhghyrhxfytreuhxyhuxgccyhuebcgyhbwbfgyhegfddyhfgyehdfgyehbfgdhefdgyehedfgdhbvgyhbggyhbgvyhdbfgyhuefcgyhubfgeyehudxcgyhxucnhyunbxcghnbcbghjbcghbcghcfghbcghbcbghnbcgbhbcghnbcfghnbcfghbfcghnbcfghbcfghbghbcfghbgcfgdhbcf";
+
     }
     @Test
     public void testStage5Basic() throws IOException {

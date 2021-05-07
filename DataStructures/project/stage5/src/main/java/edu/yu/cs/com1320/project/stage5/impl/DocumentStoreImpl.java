@@ -9,7 +9,6 @@ import edu.yu.cs.com1320.project.impl.*;
 import edu.yu.cs.com1320.project.stage5.Document;
 import edu.yu.cs.com1320.project.stage5.DocumentStore;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -195,24 +194,35 @@ public class DocumentStoreImpl implements DocumentStore {
             //stage 4 stuff
             return 0;
         }else{
-            if(replacedDocsHT.get(uri) == null){
-                StackImpl<DocumentImpl> newStack = new StackImpl<>();
-                replacedDocsHT.put(uri, newStack);
-            }
-            StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
-            stack.push(docReturn);//Remember this can be null
-            Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
-            commandStack.push(new GenericCommand<>(uri, undoReplaceFunction));
-            //need for heap
-            if(docReturn.getDocumentTxt() != null){
-                docBytesAmount -= docReturn.getDocumentTxt().getBytes().length;
-            }else{
-                docBytesAmount -= docReturn.getDocumentBinaryData().length;
-            }
+
             docReturn.setLastUseTime(-10000);
             if(!urisOnDisc.contains(docReturn.getKey())) {
                 leastUsedDocs.reHeapify(docReturn);
                 leastUsedDocs.remove();
+                //need for heap
+                if(docReturn.getDocumentTxt() != null){
+                    docBytesAmount -= docReturn.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= docReturn.getDocumentBinaryData().length;
+                }
+                if(replacedDocsHT.get(uri) == null){
+                    StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                    replacedDocsHT.put(uri, newStack);
+                }
+                StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
+                stack.push(docReturn);//Remember this can be null
+                Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
+                commandStack.push(new GenericCommand<>(uri, undoReplaceFunction));
+            }else {
+                if(replacedDocsHT.get(uri) == null){
+                    StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                    replacedDocsHT.put(uri, newStack);
+                }
+                StackImpl<DocumentImpl> stack = replacedDocsHT.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
+                stack.push(docReturn);//Remember this can be null
+                Function<URI,Boolean> undoReplaceDocumentFromDiskFunction= uri1 -> this.undoReplaceDocumentFromDisk(uri1);
+                commandStack.push(new GenericCommand<>(uri, undoReplaceDocumentFromDiskFunction));
+                docCount++;
             }
             return docReturn.hashCode();
         }
@@ -222,15 +232,19 @@ public class DocumentStoreImpl implements DocumentStore {
     private void deleteFromPut(URI uri,DocumentImpl docReturn){
         //need for heap
         if(docReturn != null){
-            docCount--;
-            if(docReturn.getDocumentTxt() != null){
-                docBytesAmount -= docReturn.getDocumentTxt().getBytes().length;
-            }else{
-                docBytesAmount -= docReturn.getDocumentBinaryData().length;
+            if(!urisOnDisc.contains(docReturn.getKey())) {
+                docReturn.setLastUseTime(-10000);
+                leastUsedDocs.reHeapify(docReturn);
+                leastUsedDocs.remove();
+                docCount--;
+                if(docReturn.getDocumentTxt() != null){
+                    docBytesAmount -= docReturn.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= docReturn.getDocumentBinaryData().length;
+                }
+            }else {
+                urisOnDisc.remove(docReturn.getKey());
             }
-            docReturn.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(docReturn);
-            leastUsedDocs.remove();
         }
         //new stuff for stage 3
         if(docReturn != null){
@@ -255,7 +269,7 @@ public class DocumentStoreImpl implements DocumentStore {
 
 
 
-    private Boolean undoReplaceDocument(URI uri1) {
+    private Boolean undoReplaceDocument(URI uri1) {//********HAVE PROBLEM NNEEDD TO FIX DOC COUNT _BeH fixed
         if(uri1 == null){
             throw new IllegalArgumentException("Tried to undo a null URI");
         }
@@ -298,6 +312,49 @@ public class DocumentStoreImpl implements DocumentStore {
         }
         return true;
     }
+    private Boolean undoReplaceDocumentFromDisk(URI uri1) {
+        if(uri1 == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
+        DocumentImpl docThatWASreplaced = (DocumentImpl) replacedDocsHT.get(uri1).pop();  //This is the doc that was replaced that were putting back
+        byte[] newBdToAdd;
+        if(docThatWASreplaced.getDocumentTxt() != null) {
+            newBdToAdd = docThatWASreplaced.getDocumentTxt().getBytes();
+        }else{
+            newBdToAdd = docThatWASreplaced.getDocumentBinaryData();
+        }
+        this.ensureHaveEnoughRoom(uri1,newBdToAdd);
+        docCount++;
+        DocumentImpl docThatReplaced = (DocumentImpl) docStoreBTree.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
+        try {
+            docStoreBTree.moveToDisk(docThatWASreplaced.getKey());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(docThatReplaced != null) {
+            Set<String> words = docThatReplaced.getWords();
+            URI uriOfDocThatReplaced = docThatReplaced.getKey();
+            for (String w : words) {
+                trie.delete(w, uriOfDocThatReplaced);
+            }
+            //new for stage 4
+//            if(!urisOnDisc.contains(docThatReplaced.getKey())) {
+//                docThatReplaced.setLastUseTime(-10000);
+//                leastUsedDocs.reHeapify(docThatReplaced);
+//                leastUsedDocs.remove();
+//                docCount--;
+//                if(docThatReplaced.getDocumentTxt() != null) {
+//                    docBytesAmount -= docThatReplaced.getDocumentTxt().getBytes().length;
+//                }else{
+//                    docBytesAmount -= docThatReplaced.getDocumentBinaryData().length;
+//                }
+//            }else{
+//                urisOnDisc.remove(docThatReplaced.getKey());
+//            }
+            urisOnDisc.remove(docThatReplaced.getKey());
+        }
+        return true;
+    }
 
     private Boolean undoPutDocument(URI uri1) {
         if(uri1 == null){
@@ -315,15 +372,19 @@ public class DocumentStoreImpl implements DocumentStore {
                 trie.delete(w, docURI);
             }
             //stage 4 stuff
-            docCount--;
-            if(doc.getDocumentTxt() != null) {
-                docBytesAmount -= doc.getDocumentTxt().getBytes().length;
+            if(!urisOnDisc.contains(docURI)) {
+                doc.setLastUseTime(-10000);
+                leastUsedDocs.reHeapify(doc);
+                leastUsedDocs.remove();
+                docCount--;
+                if(doc.getDocumentTxt() != null) {
+                    docBytesAmount -= doc.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= doc.getDocumentBinaryData().length;
+                }
             }else{
-                docBytesAmount -= doc.getDocumentBinaryData().length;
+                urisOnDisc.remove(doc.getKey());
             }
-            doc.setLastUseTime(-10000);
-            leastUsedDocs.reHeapify(doc);
-            leastUsedDocs.remove();
 
         }
         return true;
@@ -368,30 +429,54 @@ public class DocumentStoreImpl implements DocumentStore {
                 trie.delete(w, docURI);
             }
             //stage 4 stuff
-            docCount--;
-            if(doc.getDocumentTxt() != null){
-                docBytesAmount -= doc.getDocumentTxt().getBytes().length;
-            }else{
-                docBytesAmount -= doc.getDocumentBinaryData().length;
-            }
-            doc.setLastUseTime(-10000);
             if(!urisOnDisc.contains(docURI)) {
+                doc.setLastUseTime(-10000);
                 leastUsedDocs.reHeapify(doc);
                 leastUsedDocs.remove();
+                docCount--;
+                if(doc.getDocumentTxt() != null){
+                    docBytesAmount -= doc.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= doc.getDocumentBinaryData().length;
+                }
+                //Stage 2 stuff
+                //These next few lines are all needed for undo purposes
+                if(deletedDocsHT.get(uri) == null){
+                    StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                    deletedDocsHT.put(uri, newStack);
+                }
+                StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+
+                stack.push(doc);//Remember this can be null
+                Function<URI,Boolean> undoDeleteFunction= uri1 -> this.undoDeleteDocument(uri1);
+                commandStack.push(new GenericCommand<>(uri, undoDeleteFunction));
+            }else{
+                urisOnDisc.remove(doc.getKey());
+                //Stage 2&5 stuff
+                //These next few lines are all needed for undo purposes
+                if(deletedDocsHT.get(uri) == null){
+                    StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                    deletedDocsHT.put(uri, newStack);
+                }
+                StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+
+                stack.push(doc);//Remember this can be null
+                Function<URI,Boolean> undoDeleteDocFromDiskFunction= uri1 -> this.undoDeleteDocFromDisk(uri1);
+                commandStack.push(new GenericCommand<>(uri, undoDeleteDocFromDiskFunction));
             }
 
-        }
-        //Stage 2 stuff
-        //These next few lines are all needed for undo purposes
-        if(deletedDocsHT.get(uri) == null){
-            StackImpl<DocumentImpl> newStack = new StackImpl<>();
-            deletedDocsHT.put(uri, newStack);
-        }
-        StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
+        }else{
+            if(deletedDocsHT.get(uri) == null){
+                StackImpl<DocumentImpl> newStack = new StackImpl<>();
+                deletedDocsHT.put(uri, newStack);
+            }
+            StackImpl<DocumentImpl> stack = deletedDocsHT.get(uri);
 
-        stack.push(doc);//Remember this can be null
-        Function<URI,Boolean> undoDeleteFunction= uri1 -> this.undoDeleteDocument(uri1);
-        commandStack.push(new GenericCommand<>(uri, undoDeleteFunction));
+            stack.push(doc);//Remember this can be null
+            Function<URI,Boolean> undoDeleteFunction= uri1 -> this.undoDeleteDocument(uri1);
+            commandStack.push(new GenericCommand<>(uri, undoDeleteFunction));
+        }
+
         //Previous lines were needed for undo purposes
         if(doc == null){
             return false;
@@ -432,6 +517,46 @@ public class DocumentStoreImpl implements DocumentStore {
             }
             doc.setLastUseTime(System.nanoTime());
             leastUsedDocs.insert(doc);
+        }
+        return true;
+    }
+    private Boolean undoDeleteDocFromDisk(URI uri1) {
+        if(uri1 == null){
+            throw new IllegalArgumentException("Tried to undo a null URI");
+        }
+        DocumentImpl doc = (DocumentImpl) (deletedDocsHT.get(uri1).pop());
+//        if(doc != null) {
+////            byte[] newBdToAdd;
+////            if (doc.getDocumentTxt() != null) {
+////                newBdToAdd = doc.getDocumentTxt().getBytes();
+////            } else {
+////                newBdToAdd = doc.getDocumentBinaryData();
+////            }
+////           // this.ensureHaveEnoughRoom(uri1, newBdToAdd);
+//        }
+        docStoreBTree.put(uri1, doc);
+        try {
+            docStoreBTree.moveToDisk(uri1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //new stuff for stage 3
+        if(doc != null) {
+            Set<String> words = doc.getWords();
+            URI docURI = doc.getKey();
+            for (String w : words) {
+
+                trie.put(w, docURI);
+            }
+            //new stage 4
+            //docCount++;
+//            if(doc.getDocumentTxt() != null){
+//                docBytesAmount += doc.getDocumentTxt().getBytes().length;
+//            }else{
+//                docBytesAmount += doc.getDocumentBinaryData().length;
+//            }
+//            doc.setLastUseTime(System.nanoTime());
+//            leastUsedDocs.insert(doc);
         }
         return true;
     }
@@ -623,17 +748,19 @@ public class DocumentStoreImpl implements DocumentStore {
         for(Document d : deletedDocs){
             docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
-            //stage 4 stuff
-            docCount--;
-            if(d.getDocumentTxt() != null){
-                docBytesAmount -= d.getDocumentTxt().getBytes().length;
-            }else{
-                docBytesAmount -= d.getDocumentBinaryData().length;
-            }
             d.setLastUseTime(-10000);
             if(!urisOnDisc.contains(d.getKey())) {
                 leastUsedDocs.reHeapify(d);
                 leastUsedDocs.remove();
+                docCount--;
+                //stage 4 stuff
+                if(d.getDocumentTxt() != null){
+                    docBytesAmount -= d.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= d.getDocumentBinaryData().length;
+                }
+            }else{
+                urisOnDisc.remove(d.getKey());
             }
             //These next few lines are need for undo purposes
             if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
@@ -667,18 +794,23 @@ public class DocumentStoreImpl implements DocumentStore {
         for(Document d : deletedDocs){
             docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
-            //stage 4 stuff
-            docCount--;
-            if(d.getDocumentTxt() != null){
-                docBytesAmount -= d.getDocumentTxt().getBytes().length;
-            }else{
-                docBytesAmount -= d.getDocumentBinaryData().length;
-            }
             d.setLastUseTime(-10000);
             if(!urisOnDisc.contains(d.getKey())) {
                 leastUsedDocs.reHeapify(d);
                 leastUsedDocs.remove();
+                docCount--;
+                //stage 4 stuff
+
+                if(d.getDocumentTxt() != null){
+                    docBytesAmount -= d.getDocumentTxt().getBytes().length;
+                }else{
+                    docBytesAmount -= d.getDocumentBinaryData().length;
+                }
+            }else{
+                urisOnDisc.remove(d.getKey());
             }
+
+
             //These next few lines are need for undo purposes
             if (!(deletedDocsHT.get(d.getKey()) instanceof StackImpl)) {
                 StackImpl<DocumentImpl> newStack = new StackImpl<>();
@@ -847,6 +979,11 @@ public class DocumentStoreImpl implements DocumentStore {
         leastUsedDocs.insert(doc);
         docStoreBTree.put(doc.getKey(),doc);
         docCount++;
+        if(doc.getDocumentTxt() != null) {
+            docBytesAmount += doc.getDocumentTxt().getBytes().length;
+        }else{
+            docBytesAmount += doc.getDocumentBinaryData().length;
+        }
         urisOnDisc.remove(doc.getKey());
         this.ensureHaveEnoughRoom();
 

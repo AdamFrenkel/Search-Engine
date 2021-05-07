@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 //import java.util.HashMap;
 
+/**
+ * created by the document store and given to the BTree via a call to BTree.setPersistenceManager
+ */
 public class DocumentPersistenceManager implements PersistenceManager<URI, Document> {
     private Gson gson = new GsonBuilder().registerTypeAdapter(DocumentImpl.class, new DocSerializer()).registerTypeAdapter(DocumentImpl.class,new DocDeserializer()).setPrettyPrinting().create();
     private String dir;
