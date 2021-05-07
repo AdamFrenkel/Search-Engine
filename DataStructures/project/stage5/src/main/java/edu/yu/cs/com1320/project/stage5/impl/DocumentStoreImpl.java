@@ -28,6 +28,8 @@ public class DocumentStoreImpl implements DocumentStore {
     private boolean maxDocBytesBoolean = false;
     private int maxDocumentCount = Integer.MAX_VALUE;
     private int maxDocumentBytes = Integer.MAX_VALUE;
+    private Map<URI, StackImpl<Set<URI>>> putUriCausedTheseDocsToGetMovedToDisc= new HashMap<>();
+    private Map<URI, StackImpl<Set<URI>>> replacedUriCausedTheseDocsToGetMovedToDisc= new HashMap<>();
     private MinHeapImpl<Document> leastUsedDocs = new MinHeapImpl();
     private int docCount = 0;
     private int docBytesAmount = 0;
@@ -71,14 +73,33 @@ public class DocumentStoreImpl implements DocumentStore {
 //        if(hashTable.get(uri) == null) {
 //            leastUsedDocs.insert(doc);
 //        }
-        this.ensureHaveEnoughRoom(uri,bD);
+        if(docStoreBTree.get(uri) ==null) {
+            Set<URI> urisOfDocsThatWereSentToDisc = this.ensureHaveEnoughRoom(uri, bD);
+            if (putUriCausedTheseDocsToGetMovedToDisc.get(uri) == null) {
+                StackImpl<Set<URI>> newStack = new StackImpl<>();
+                putUriCausedTheseDocsToGetMovedToDisc.put(uri, newStack);
+            }
+            StackImpl<Set<URI>> stack = putUriCausedTheseDocsToGetMovedToDisc.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
+            stack.push(urisOfDocsThatWereSentToDisc);
+            putUriCausedTheseDocsToGetMovedToDisc.put(uri, stack);
+        }else{
+            Set<URI> urisOfDocsThatWereSentToDisc = this.ensureHaveEnoughRoom(uri, bD);
+            if (replacedUriCausedTheseDocsToGetMovedToDisc.get(uri) == null) {
+                StackImpl<Set<URI>> newStack = new StackImpl<>();
+                replacedUriCausedTheseDocsToGetMovedToDisc.put(uri, newStack);
+            }
+            StackImpl<Set<URI>> stack = replacedUriCausedTheseDocsToGetMovedToDisc.get(uri);   //This isn't docReturn's uri, because wont have access to that when trying to undo
+            stack.push(urisOfDocsThatWereSentToDisc);
+            replacedUriCausedTheseDocsToGetMovedToDisc.put(uri, stack);
+        }
         //need for a few stages
         docReturn = (DocumentImpl)docStoreBTree.put(uri, doc);
         //new stuff for stage 3 ie: trie stuff
         putStage3(doc, docReturn);
         return this.putFromPut(uri,docReturn,format,doc);
     }
-    private void ensureHaveEnoughRoom(URI uri, byte[] newBD) {
+    private Set<URI> ensureHaveEnoughRoom(URI uri, byte[] newBD) {
+        Set<URI> urisOfDocsThatWereSentToDisc = new HashSet<>();
         int lengthOfBdGettingReplaced = 0;
         Document doc2 = docStoreBTree.get(uri);
 //        if(urisOnDisc.contains(uri)){
@@ -110,6 +131,8 @@ public class DocumentStoreImpl implements DocumentStore {
                         throw new IllegalArgumentException("Tried to undo a null URI");
                     }
                     Document doc = docStoreBTree.get(uriToDelete);
+
+                    urisOfDocsThatWereSentToDisc.add(uriToDelete);
 //                    if(urisOnDisc.contains(uriToDelete)){
 //                        this.bringBack(doc);
 //                        urisOnDisc.remove(uriToDelete);
@@ -156,6 +179,7 @@ public class DocumentStoreImpl implements DocumentStore {
                 }
             }
         }
+        return urisOfDocsThatWereSentToDisc;
     }
     private void putStage3(Document doc, Document docReturn){
         Set<String> words = doc.getWords();
@@ -310,6 +334,12 @@ public class DocumentStoreImpl implements DocumentStore {
             docThatWASreplaced.setLastUseTime(System.nanoTime());
             leastUsedDocs.insert(docThatWASreplaced);
         }
+        if(replacedUriCausedTheseDocsToGetMovedToDisc.containsKey(uri1)) {
+            Set<URI> urisToBringBack = replacedUriCausedTheseDocsToGetMovedToDisc.get(uri1).pop();
+            for (URI u : urisToBringBack) {
+                this.bringBack(docStoreBTree.get(u));
+            }
+        }
         return true;
     }
     private Boolean undoReplaceDocumentFromDisk(URI uri1) {
@@ -351,7 +381,14 @@ public class DocumentStoreImpl implements DocumentStore {
 //            }else{
 //                urisOnDisc.remove(docThatReplaced.getKey());
 //            }
+
             urisOnDisc.remove(docThatReplaced.getKey());
+        }
+        if(replacedUriCausedTheseDocsToGetMovedToDisc.containsKey(uri1)) {
+            Set<URI> urisToBringBack = replacedUriCausedTheseDocsToGetMovedToDisc.get(uri1).pop();
+            for (URI u : urisToBringBack) {
+                this.bringBack(docStoreBTree.get(u));
+            }
         }
         return true;
     }
@@ -383,9 +420,15 @@ public class DocumentStoreImpl implements DocumentStore {
                     docBytesAmount -= doc.getDocumentBinaryData().length;
                 }
             }else{
+
                 urisOnDisc.remove(doc.getKey());
             }
-
+            if(putUriCausedTheseDocsToGetMovedToDisc.containsKey(uri1)) {
+                Set<URI> urisToBringBack = putUriCausedTheseDocsToGetMovedToDisc.get(uri1).pop();
+                for (URI u : urisToBringBack) {
+                    this.bringBack(docStoreBTree.get(u));
+                }
+            }
         }
         return true;
     }
