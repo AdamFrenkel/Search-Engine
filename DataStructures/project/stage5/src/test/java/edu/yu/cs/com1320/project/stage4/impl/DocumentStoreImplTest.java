@@ -31,72 +31,72 @@ public class DocumentStoreImplTest {
     /**
     my stage 5 tests
      */
-//    @Test
-//    public void testStage5Undo2() throws IOException {
-//        DocumentStore store = new DocumentStoreImpl(null);
-//        System.out.println("txt1 bytes = " + txt1.getBytes().length);
-//        System.out.println("txt2 bytes = " + txt2.getBytes().length);
-//        System.out.println("txt3 bytes = " + txt3.getBytes().length);
-//        System.out.println("txt4 bytes = " + txt4.getBytes().length);
-//        System.out.println("txt5 bytes = " + txt5.getBytes().length);
-//        System.out.println("txt6 bytes = " + txt6.getBytes().length);
-//        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
-////        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
-////        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
-////        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()), this.uri4, DocumentStore.DocumentFormat.TXT);
-////        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()), this.uri5, DocumentStore.DocumentFormat.TXT);
-////        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()), this.uri6, DocumentStore.DocumentFormat.TXT);
-//        String fileNameUri1 = System.getProperty("user.dir") + uri1.getRawSchemeSpecificPart();
-//        String fileNameUri2 = System.getProperty("user.dir") + uri2.getRawSchemeSpecificPart();
-//        String fileNameUri3 = System.getProperty("user.dir") + uri3.getRawSchemeSpecificPart();
-//        String fileNameUri4 = System.getProperty("user.dir") + uri4.getRawSchemeSpecificPart();
-//        String fileNameUri5 = System.getProperty("user.dir") + uri5.getRawSchemeSpecificPart();
-//        String fileNameUri6 = System.getProperty("user.dir") + uri6.getRawSchemeSpecificPart();
-//        boolean pass = false;
-//        try {
-//            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
-//        } catch (NoSuchFileException n) {
-//            pass = true;
-//        }
-//        assertTrue(pass);
-//        assertNotNull(store.getDocument(uri1));
-//        store.setMaxDocumentBytes(0);
-//        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri1 + ".json")));
-//        store.deleteDocument(uri1);
-//        pass = false;
-//        try {
-//            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
-//        } catch (NoSuchFileException n) {
-//            pass = true;
-//        }
-//        assertTrue(pass);
-//        store.setMaxDocumentBytes(10000);
-//        store.setMaxDocumentCount(1);
+    @Test
+    public void testStage5Undo2() throws IOException {
+        DocumentStore store = new DocumentStoreImpl(null);
+        System.out.println("txt1 bytes = " + txt1.getBytes().length);
+        System.out.println("txt2 bytes = " + txt2.getBytes().length);
+        System.out.println("txt3 bytes = " + txt3.getBytes().length);
+        System.out.println("txt4 bytes = " + txt4.getBytes().length);
+        System.out.println("txt5 bytes = " + txt5.getBytes().length);
+        System.out.println("txt6 bytes = " + txt6.getBytes().length);
+        store.putDocument(new ByteArrayInputStream(this.txt1.getBytes()), this.uri1, DocumentStore.DocumentFormat.TXT);
 //        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
 //        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
-//        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
-//        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
-//        pass = false;
-//        try {
-//            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
-//        } catch (NoSuchFileException n) {
-//            pass = true;
-//        }
-//        assertTrue(pass);
-//        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri3 + ".json")));
-//        assertEquals(1,store.search("4th").size());
-//        assertNotNull(store.getDocument(uri2));
-//        store.undo();
-//        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
-//        pass = false;
-//        try {
-//            Files.readAllBytes(Paths.get(fileNameUri3 + ".json"));
-//        } catch (NoSuchFileException n) {
-//            pass = true;
-//        }
-//        assertTrue(pass);
-//        assertNotNull(store.getDocument(uri3));
-//    }
+//        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()), this.uri4, DocumentStore.DocumentFormat.TXT);
+//        store.putDocument(new ByteArrayInputStream(this.txt5.getBytes()), this.uri5, DocumentStore.DocumentFormat.TXT);
+//        store.putDocument(new ByteArrayInputStream(this.txt6.getBytes()), this.uri6, DocumentStore.DocumentFormat.TXT);
+        String fileNameUri1 = System.getProperty("user.dir") + uri1.getRawSchemeSpecificPart();
+        String fileNameUri2 = System.getProperty("user.dir") + uri2.getRawSchemeSpecificPart();
+        String fileNameUri3 = System.getProperty("user.dir") + uri3.getRawSchemeSpecificPart();
+        String fileNameUri4 = System.getProperty("user.dir") + uri4.getRawSchemeSpecificPart();
+        String fileNameUri5 = System.getProperty("user.dir") + uri5.getRawSchemeSpecificPart();
+        String fileNameUri6 = System.getProperty("user.dir") + uri6.getRawSchemeSpecificPart();
+        boolean pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        } catch (NoSuchFileException n) {
+            pass = true;
+        }
+        assertTrue(pass);
+        assertNotNull(store.getDocument(uri1));
+        store.setMaxDocumentBytes(0);
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri1 + ".json")));
+        store.deleteDocument(uri1);
+        pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri1 + ".json"));
+        } catch (NoSuchFileException n) {
+            pass = true;
+        }
+        assertTrue(pass);
+        store.setMaxDocumentBytes(10000);
+        store.setMaxDocumentCount(1);
+        store.putDocument(new ByteArrayInputStream(this.txt2.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        store.putDocument(new ByteArrayInputStream(this.txt3.getBytes()), this.uri3, DocumentStore.DocumentFormat.TXT);
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
+        store.putDocument(new ByteArrayInputStream(this.txt4.getBytes()), this.uri2, DocumentStore.DocumentFormat.TXT);
+        pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri2 + ".json"));
+        } catch (NoSuchFileException n) {
+            pass = true;
+        }
+        assertTrue(pass);
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri3 + ".json")));
+        assertEquals(1,store.search("4th").size());
+        assertNotNull(store.getDocument(uri2));
+        store.undo();
+        assertNotNull(Files.readAllBytes(Paths.get(fileNameUri2 + ".json")));
+        pass = false;
+        try {
+            Files.readAllBytes(Paths.get(fileNameUri3 + ".json"));
+        } catch (NoSuchFileException n) {
+            pass = true;
+        }
+        assertTrue(pass);
+        assertNotNull(store.getDocument(uri3));
+    }
     @Test
     public void testStage5Undo() throws IOException {
         DocumentStore store = new DocumentStoreImpl(null);
