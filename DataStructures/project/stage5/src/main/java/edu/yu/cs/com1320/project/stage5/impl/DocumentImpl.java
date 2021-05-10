@@ -192,6 +192,9 @@ public class DocumentImpl implements Document {
 
     @Override
     public int compareTo(Document o) {
+//        if(o == null){
+//            return 1;
+//        }
         if(this.getLastUseTime() > o.getLastUseTime()){
             return 1;
         }

@@ -204,6 +204,9 @@ public class DocumentPersistenceManager implements PersistenceManager<URI, Docum
 
     @Override
     public Document deserialize(URI key) throws IOException {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null in desearialize");
+        }
         URI uri = (URI) key;
         String fileName = dir + uri.getRawSchemeSpecificPart();
         String directory = fileName.substring(0,fileName.lastIndexOf("/"));
