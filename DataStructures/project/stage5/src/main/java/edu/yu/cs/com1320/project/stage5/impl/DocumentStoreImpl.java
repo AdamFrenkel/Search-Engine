@@ -18,8 +18,9 @@ import java.util.function.Function;
 
 public class DocumentStoreImpl implements DocumentStore {
     private StackImpl<Undoable> commandStack = new StackImpl<>();
-//    private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
+    //    private HashTableImpl<URI, Document> hashTable = new HashTableImpl<>();
     private BTreeImpl<URI, Document> docStoreBTree = new BTreeImpl<>();
+    // private WrongBTree <URI, Document> docStoreBTree = new WrongBTree<>();
     private Map<URI, StackImpl> deletedDocsHT = new HashMap<>();
     private Map<URI, StackImpl> replacedDocsHT = new HashMap<>(); //This will map uris of the OG doc to the doc repaced by it
     private TrieImpl<URI> trie = new TrieImpl<>();
@@ -29,19 +30,25 @@ public class DocumentStoreImpl implements DocumentStore {
     private int maxDocumentBytes = Integer.MAX_VALUE;
     private Map<URI, StackImpl<Set<URI>>> putUriCausedTheseDocsToGetMovedToDisc= new HashMap<>();
     private Map<URI, StackImpl<Set<URI>>> replacedUriCausedTheseDocsToGetMovedToDisc= new HashMap<>();
-    private MinHeapImpl<MinHeapEntry> leastUsedDocs = new MinHeapImpl();
-    private Map<URI,MinHeapEntry> mhEntries = new HashMap<>();
+    private MinHeapImpl<MinHeapEntry> leastUsedDocsNew = new MinHeapImpl();
+    private MinHeapImpl<Document> leastUsedDocs = new MinHeapImpl();
     private int docCount = 0;
     private int docBytesAmount = 0;
     private Set<URI> urisOnDisc = new HashSet<>();
+    private Map<URI, Long> urisLastTimeUse = new HashMap<>();
     public DocumentStoreImpl(File baseDir){
         DocumentPersistenceManager pm = new DocumentPersistenceManager(baseDir);
+        docStoreBTree.setPersistenceManager(pm);
+    }
+    public DocumentStoreImpl(){
+        DocumentPersistenceManager pm = new DocumentPersistenceManager(null);
         docStoreBTree.setPersistenceManager(pm);
     }
     private class MinHeapEntry implements Comparable<MinHeapEntry>{
         private URI uri;
         private MinHeapEntry(URI u) {
             uri =u;
+
         }
         private URI getURI(){
             return uri;
@@ -60,7 +67,15 @@ public class DocumentStoreImpl implements DocumentStore {
 //            if(docStoreBTree.get(this.uri) == docStoreBTree.get(m.getURI())){
 //                return 1;
 //            }
-           return docStoreBTree.get(this.uri).compareTo(docStoreBTree.get(m.getURI()));
+//            if(urisLastTimeUse.get(this.getURI())>urisLastTimeUse.get(m.getURI())){
+//                return 1;
+//            }
+//            if(urisLastTimeUse.get(this.getURI())<urisLastTimeUse.get(m.getURI())){
+//                return -1;
+//            }
+            return 0;
+
+
         }
 
         @Override
@@ -112,7 +127,7 @@ public class DocumentStoreImpl implements DocumentStore {
 //            leastUsedDocs.insert(doc);
 //        }
         if(docStoreBTree.get(uri) ==null) {
-            Set<URI> urisOfDocsThatWereSentToDisc = this.ensureHaveEnoughRoom(uri, bD, false);
+            Set<URI> urisOfDocsThatWereSentToDisc = this.ensureHaveEnoughRoom(uri, bD,false);
             if (putUriCausedTheseDocsToGetMovedToDisc.get(uri) == null) {
                 StackImpl<Set<URI>> newStack = new StackImpl<>();
                 putUriCausedTheseDocsToGetMovedToDisc.put(uri, newStack);
@@ -162,7 +177,8 @@ public class DocumentStoreImpl implements DocumentStore {
         while((maxDocCountBoolean && docCount + 1 > maxDocumentCount && (doc2 == null || replacingDocOnDisc)) || (maxDocBytesBoolean && (docBytesAmount + newBD.length - lengthOfBdGettingReplaced) > maxDocumentBytes)){
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
-                DocumentImpl leastUsedDoc = (DocumentImpl) docStoreBTree.get(leastUsedDocs.remove().uri);
+                DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
+              //  DocumentImpl leastUsedDoc = (DocumentImpl) docStoreBTree.get(leastUsedDocs.remove().getURI());
                 URI uri3 = leastUsedDoc.getKey();
                 Document doc3 = docStoreBTree.get(leastUsedDoc.getKey()); //I do see potential danger in constantly getting the least used doc and
 //                if(urisOnDisc.contains(uri3)){
@@ -212,10 +228,10 @@ public class DocumentStoreImpl implements DocumentStore {
                         //if(potStack != null) {
                         deletedDocsHT.put(uriToDelete, null);
                         //}
-                       // potStack = replacedDocsHT.get(uriToDelete);
-                       // if(potStack != null) {
+                        // potStack = replacedDocsHT.get(uriToDelete);
+                        // if(potStack != null) {
                         replacedDocsHT.put(uriToDelete, null);
-                      //  }
+                        //  }
 //                        doc.setLastUseTime(-10000);
 //                        leastUsedDocs.reHeapify(doc);
 //                        leastUsedDocs.remove();
@@ -251,21 +267,11 @@ public class DocumentStoreImpl implements DocumentStore {
         }else{
             docBytesAmount += doc.getDocumentBinaryData().length;
         }
-        doc.setLastUseTime(System.nanoTime());
-//        if(!mhEntries.containsKey(uri)) {
-//            MinHeapEntry minHeapEntry = new MinHeapEntry(doc.getKey());
-//            leastUsedDocs.insert(minHeapEntry);
-//            mhEntries.put(uri,minHeapEntry);
-//        }else{
-//            MinHeapEntry minHeapEntry = mhEntries.get(uri);
-//            minHeapEntry.uri = doc.getKey();
-//            leastUsedDocs.reHeapify(minHeapEntry);
-//        }
-        MinHeapEntry minHeapEntry = new MinHeapEntry(doc.getKey());
-        mhEntries.put(uri,minHeapEntry);
-        //leastUsedDocs.insert(minHeapEntry);
+
         if(docReturn == null) {
-            leastUsedDocs.insert(minHeapEntry);
+            doc.setLastUseTime(System.nanoTime());
+            urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+            leastUsedDocs.insert(doc);
             //need for heap
             docCount++;
             //These next few lines are need for undo purposes
@@ -277,12 +283,12 @@ public class DocumentStoreImpl implements DocumentStore {
         }else{
 
             docReturn.setLastUseTime(-10000);
+            urisLastTimeUse.put(docReturn.getKey(),docReturn.getLastUseTime());
             if(!urisOnDisc.contains(docReturn.getKey())) {
-              //  MinHeapEntry minHeapEntry2 = mhEntries.get(docReturn.getKey());
-             //   leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(docReturn.getKey()));
+                leastUsedDocs.reHeapify(docReturn);
                 leastUsedDocs.remove();
-                leastUsedDocs.insert(minHeapEntry);
+                doc.setLastUseTime(System.nanoTime());
+                leastUsedDocs.insert(doc);
                 //need for heap
                 if(docReturn.getDocumentTxt() != null){
                     docBytesAmount -= docReturn.getDocumentTxt().getBytes().length;
@@ -298,7 +304,9 @@ public class DocumentStoreImpl implements DocumentStore {
                 Function<URI,Boolean> undoReplaceFunction= uri1 -> this.undoReplaceDocument(uri1);
                 commandStack.push(new GenericCommand<>(uri, undoReplaceFunction));
             }else {
-                leastUsedDocs.insert(minHeapEntry);
+                doc.setLastUseTime(System.nanoTime());
+                urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+                leastUsedDocs.insert(doc);
                 if(replacedDocsHT.get(uri) == null){
                     StackImpl<DocumentImpl> newStack = new StackImpl<>();
                     replacedDocsHT.put(uri, newStack);
@@ -319,8 +327,8 @@ public class DocumentStoreImpl implements DocumentStore {
         if(docReturn != null){
             if(!urisOnDisc.contains(docReturn.getKey())) {
                 docReturn.setLastUseTime(-10000);
-                MinHeapEntry minHeapEntry = mhEntries.get(docReturn.getKey());
-                leastUsedDocs.reHeapify(minHeapEntry);
+                urisLastTimeUse.put(docReturn.getKey(),docReturn.getLastUseTime());
+                leastUsedDocs.reHeapify(docReturn);
                 leastUsedDocs.remove();
                 docCount--;
                 if(docReturn.getDocumentTxt() != null){
@@ -366,7 +374,7 @@ public class DocumentStoreImpl implements DocumentStore {
         }else{
             newBdToAdd = docThatWASreplaced.getDocumentBinaryData();
         }
-        this.ensureHaveEnoughRoom(uri1,newBdToAdd,false);
+        this.ensureHaveEnoughRoom(uri1,newBdToAdd, false);
         DocumentImpl docThatReplaced = (DocumentImpl) docStoreBTree.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
         if(docThatReplaced != null) {
             Set<String> words = docThatReplaced.getWords();
@@ -382,8 +390,8 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount -= docThatReplaced.getDocumentBinaryData().length;
             }
             docThatReplaced.setLastUseTime(-10000);
-            MinHeapEntry minHeapEntry = mhEntries.get(docThatReplaced.getKey());
-            leastUsedDocs.reHeapify(minHeapEntry);
+            urisLastTimeUse.put(docThatReplaced.getKey(),docThatReplaced.getLastUseTime());
+            leastUsedDocs.reHeapify(docThatReplaced);
             leastUsedDocs.remove();
         }
         if(docThatWASreplaced != null) {
@@ -395,9 +403,8 @@ public class DocumentStoreImpl implements DocumentStore {
             docCount++;
             docBytesAmount += newBdToAdd.length;
             docThatWASreplaced.setLastUseTime(System.nanoTime());
-            MinHeapEntry minHeapEntry = new MinHeapEntry(docThatWASreplaced.getKey());
-            mhEntries.put(docThatWASreplaced.getKey(),minHeapEntry);
-            leastUsedDocs.insert(minHeapEntry);
+            urisLastTimeUse.put(docThatWASreplaced.getKey(),docThatWASreplaced.getLastUseTime());
+            leastUsedDocs.insert(docThatWASreplaced);
         }
         if(replacedUriCausedTheseDocsToGetMovedToDisc.containsKey(uri1)) {
             Set<URI> urisToBringBack = replacedUriCausedTheseDocsToGetMovedToDisc.get(uri1).pop();
@@ -418,7 +425,7 @@ public class DocumentStoreImpl implements DocumentStore {
         }else{
             newBdToAdd = docThatWASreplaced.getDocumentBinaryData();
         }
-        this.ensureHaveEnoughRoom(uri1,newBdToAdd,false);//not sure if falsa
+        this.ensureHaveEnoughRoom(uri1,newBdToAdd,false);
         docCount++;
         DocumentImpl docThatReplaced = (DocumentImpl) docStoreBTree.put(uri1, (docThatWASreplaced)); //This is the doc that replaced that were getting rid of
         try {
@@ -476,9 +483,8 @@ public class DocumentStoreImpl implements DocumentStore {
             //stage 4 stuff
             if(!urisOnDisc.contains(docURI)) {
                 doc.setLastUseTime(-10000);
-                //MinHeapEntry minHeapEntry2 = mhEntries.get(doc.getKey());
-               // leastUsedDocs.reHeapify(new MinHeapEntry(docReturn.getKey()));
-                leastUsedDocs.reHeapify(new MinHeapEntry(doc.getKey()));
+                urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+                leastUsedDocs.reHeapify(doc);
                 leastUsedDocs.remove();
                 docCount--;
                 if(doc.getDocumentTxt() != null) {
@@ -516,10 +522,8 @@ public class DocumentStoreImpl implements DocumentStore {
         }
         if(returnDoc != null) {
             returnDoc.setLastUseTime(System.nanoTime());
-//            MinHeapEntry minHeapEntry2 = mhEntries.get(returnDoc.getKey());
-//            leastUsedDocs.reHeapify(minHeapEntry2);
-            leastUsedDocs.reHeapify(new MinHeapEntry(returnDoc.getKey()));
-
+            urisLastTimeUse.put(returnDoc.getKey(),returnDoc.getLastUseTime());
+            leastUsedDocs.reHeapify(returnDoc);
         }
         return returnDoc;
     }
@@ -544,9 +548,8 @@ public class DocumentStoreImpl implements DocumentStore {
             //stage 4 stuff
             if(!urisOnDisc.contains(docURI)) {
                 doc.setLastUseTime(-10000);
-//                MinHeapEntry minHeapEntry2 = mhEntries.get(doc.getKey());
-//                leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(doc.getKey()));
+                urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+                leastUsedDocs.reHeapify(doc);
                 leastUsedDocs.remove();
                 docCount--;
                 if(doc.getDocumentTxt() != null){
@@ -631,10 +634,8 @@ public class DocumentStoreImpl implements DocumentStore {
                 docBytesAmount += doc.getDocumentBinaryData().length;
             }
             doc.setLastUseTime(System.nanoTime());
-            MinHeapEntry minHeapEntry = new MinHeapEntry(doc.getKey());
-            mhEntries.put(doc.getKey(),minHeapEntry);
-            leastUsedDocs.insert(minHeapEntry);
-
+            urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+            leastUsedDocs.insert(doc);
         }
         return true;
     }
@@ -783,9 +784,8 @@ public class DocumentStoreImpl implements DocumentStore {
              */
             if(!urisOnDisc.contains(d.getKey())) {
                 d.setLastUseTime(equivalentTimeToSetAllDocsTo);
-//                MinHeapEntry minHeapEntry2 = mhEntries.get(d.getKey());
-//                leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(d.getKey()));
+                urisLastTimeUse.put(d.getKey(),d.getLastUseTime());
+                leastUsedDocs.reHeapify(d);
             }
         }
         return returnList;
@@ -848,10 +848,8 @@ public class DocumentStoreImpl implements DocumentStore {
              */
             if(!urisOnDisc.contains(d.getKey())) {
                 d.setLastUseTime(equivalentTimeToSetAllDocsTo);
-//                MinHeapEntry minHeapEntry2 = mhEntries.get(d.getKey());
-//                leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(d.getKey()));
-
+                urisLastTimeUse.put(d.getKey(),d.getLastUseTime());
+                leastUsedDocs.reHeapify(d);
             }
         }
         return returnList;
@@ -872,10 +870,9 @@ public class DocumentStoreImpl implements DocumentStore {
             docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
             d.setLastUseTime(-10000);
+            urisLastTimeUse.put(d.getKey(),d.getLastUseTime());
             if(!urisOnDisc.contains(d.getKey())) {
-//                MinHeapEntry minHeapEntry2 = mhEntries.get(d.getKey());
-//                leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(d.getKey()));
+                leastUsedDocs.reHeapify(d);
                 leastUsedDocs.remove();
                 docCount--;
                 //stage 4 stuff
@@ -920,10 +917,9 @@ public class DocumentStoreImpl implements DocumentStore {
             docStoreBTree.put(d.getKey(),null);
             uris.add(d.getKey());
             d.setLastUseTime(-10000);
+            urisLastTimeUse.put(d.getKey(),d.getLastUseTime());
             if(!urisOnDisc.contains(d.getKey())) {
-//                MinHeapEntry minHeapEntry2 = mhEntries.get(d.getKey());
-//                leastUsedDocs.reHeapify(minHeapEntry2);
-                leastUsedDocs.reHeapify(new MinHeapEntry(d.getKey()));
+                leastUsedDocs.reHeapify(d);
                 leastUsedDocs.remove();
                 docCount--;
                 //stage 4 stuff
@@ -980,7 +976,7 @@ public class DocumentStoreImpl implements DocumentStore {
         while((maxDocCountBoolean && docCount > maxDocumentCount) || (maxDocBytesBoolean && docBytesAmount > maxDocumentBytes)){
             boolean haventFoundDocInStore = true;
             while(haventFoundDocInStore) {
-                DocumentImpl leastUsedDoc = (DocumentImpl) docStoreBTree.get(leastUsedDocs.remove().uri);
+                DocumentImpl leastUsedDoc = (DocumentImpl) leastUsedDocs.remove();
                 URI uri2 = leastUsedDoc.getKey();
                 Document doc2 = docStoreBTree.get(uri2);
 //                if(urisOnDisc.contains(uri2)){
@@ -1045,13 +1041,13 @@ public class DocumentStoreImpl implements DocumentStore {
 
         StackImpl holderStack = new StackImpl();
         while(commandStack.size()>0){
-           // Boolean haventFoundURI = true;
+            // Boolean haventFoundURI = true;
             if(commandStack.size() > 0) {
                 Undoable currentCommand = (Undoable) commandStack.pop();
                 if (currentCommand instanceof GenericCommand) {
                     if (!(((GenericCommand) currentCommand).getTarget() == uri)) {
                         // currentCommand.undo();
-                       //haventFoundURI = false;
+                        //haventFoundURI = false;
                         holderStack.push(currentCommand);
                     }
                 } else {
@@ -1065,7 +1061,7 @@ public class DocumentStoreImpl implements DocumentStore {
                             }
                         }
                         // ((CommandSet) currentCommand).undo(uri);
-                       // haventFoundURI = false;
+                        // haventFoundURI = false;
                     }
                     if (((CommandSet) currentCommand).size() != 0) {
                         holderStack.push(currentCommand);
@@ -1074,9 +1070,9 @@ public class DocumentStoreImpl implements DocumentStore {
             }
         }
         while (holderStack.size() > 0) {
-                commandStack.push((Undoable) holderStack.pop());
+            commandStack.push((Undoable) holderStack.pop());
         }
-            // throw new IllegalStateException("there are no actions on the command stack for the given URI");
+        // throw new IllegalStateException("there are no actions on the command stack for the given URI");
 
         while (holderStack.size()>0){
             commandStack.push((Undoable) holderStack.pop());
@@ -1103,9 +1099,8 @@ public class DocumentStoreImpl implements DocumentStore {
 //            e.printStackTrace();
 //        }
         doc.setLastUseTime(System.nanoTime());
-        MinHeapEntry minHeapEntry = new MinHeapEntry(doc.getKey());
-        mhEntries.put(doc.getKey(),minHeapEntry);
-        leastUsedDocs.insert(minHeapEntry);
+        urisLastTimeUse.put(doc.getKey(),doc.getLastUseTime());
+        leastUsedDocs.insert(doc);
         docStoreBTree.put(doc.getKey(),doc);
         docCount++;
         if(doc.getDocumentTxt() != null) {

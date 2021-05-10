@@ -33,7 +33,7 @@ public class DocumentStoreImplTest {
      */
     @Test
     public void testStage5Undo2() throws IOException {
-        DocumentStore store = new DocumentStoreImpl(null);
+        DocumentStore store = new DocumentStoreImpl();
         System.out.println("txt1 bytes = " + txt1.getBytes().length);
         System.out.println("txt2 bytes = " + txt2.getBytes().length);
         System.out.println("txt3 bytes = " + txt3.getBytes().length);
@@ -99,7 +99,7 @@ public class DocumentStoreImplTest {
     }
     @Test
     public void testStage5Undo() throws IOException {
-        DocumentStore store = new DocumentStoreImpl(null);
+        DocumentStore store = new DocumentStoreImpl();
         System.out.println("txt1 bytes = " + txt1.getBytes().length);
         System.out.println("txt2 bytes = " + txt2.getBytes().length);
         System.out.println("txt3 bytes = " + txt3.getBytes().length);
