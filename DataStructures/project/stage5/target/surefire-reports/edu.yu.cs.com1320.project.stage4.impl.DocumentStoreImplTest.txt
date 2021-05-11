@@ -1,16 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest
 -------------------------------------------------------------------------------
-Tests run: 52, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 0.183 s <<< FAILURE! - in edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest
-edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testStage5Undo2  Time elapsed: 0.022 s  <<< ERROR!
-java.lang.IllegalArgumentException: key is null in desearialize
-	at edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testStage5Undo2(DocumentStoreImplTest.java:89)
-
-edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testUndo  Time elapsed: 0.007 s  <<< ERROR!
-java.lang.IllegalArgumentException: element not in array
-	at edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testUndo(DocumentStoreImplTest.java:1063)
-
-edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testGetAndPutReturnValues  Time elapsed: 0.005 s  <<< ERROR!
-java.lang.IllegalArgumentException: element not in array
-	at edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest.testGetAndPutReturnValues(DocumentStoreImplTest.java:2342)
-
+Tests run: 52, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.191 s - in edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest
