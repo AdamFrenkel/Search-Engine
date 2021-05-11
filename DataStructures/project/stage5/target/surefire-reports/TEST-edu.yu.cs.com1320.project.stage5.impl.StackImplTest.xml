@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.191" tests="52" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.116" tests="9" errors="0" skipped="0" failures="0">
   <properties>
     <property name="gopherProxySet" value="false"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -61,107 +61,13 @@
     <property name="java.class.version" value="55.0"/>
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
   </properties>
-  <testcase name="testCollisionPutValues" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.005"/>
-  <testcase name="basicSearchDeleteTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.003"/>
-  <testcase name="testStackUriPutOverwrite" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testStackUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testUndoCommandSet2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testUndoCommandSet" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.003"/>
-  <testcase name="testCollisionPutValues2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.002"/>
-  <testcase name="testStage5Basic" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.014">
-    <system-out><![CDATA[New dir created
-New dir created
-dir here already
-dir here already
-dir here already
-]]></system-out>
-  </testcase>
-  <testcase name="testStage5Bytes" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.03">
-    <system-out><![CDATA[txt1 bytes = 38
-txt2 bytes = 29
-txt3 bytes = 38
-txt4 bytes = 43
-txt5 bytes = 45
-txt6 bytes = 533
-dir here already
-dir here already
-dir here already
-dir here already
-dir here already
-New dir created
-]]></system-out>
-  </testcase>
-  <testcase name="testStage5Undo2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.02">
-    <system-out><![CDATA[txt1 bytes = 38
-txt2 bytes = 29
-txt3 bytes = 38
-txt4 bytes = 43
-txt5 bytes = 45
-txt6 bytes = 533
-New dir created
-New dir created
-New dir created
-dir here already
-]]></system-out>
-  </testcase>
-  <testcase name="DocumentStoreImplTest2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.002"/>
-  <testcase name="testPointlessDeleteFullUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.01"/>
-  <testcase name="testThrowsException" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testStage5Basic2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.02">
-    <system-out><![CDATA[dir here already
-dir here already
-dir here already
-New dir created
-New dir created
-dir here already
-]]></system-out>
-  </testcase>
-  <testcase name="testPutNullDeletion" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.007"/>
-  <testcase name="testPutDocumentStoreAsBinary" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.002"/>
-  <testcase name="testStackUndoUri" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testUndoSpecificUri" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="undoTest2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testPointlessPutEmptyUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="TestDeleteDocument" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="addNewToStore" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="undoTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testPutDocumentStoreAsText" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="TestBasicBinaryDocument" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="wordCountAndGetWordsTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testPointlessPutFullUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testPutDocumentStoreAsText2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.004"/>
-  <testcase name="testGetAndPutReturnValues" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.011"/>
-  <testcase name="testDeleteAndDeleteAll" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.004"/>
-  <testcase name="testStackUriDeleteOverwriteMultipleDocs" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="DocumentStoreImplTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="basicPutOverwriteTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testSimplePutValues2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testStackUriDeleteOverwrite" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testStage5Undo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.011">
-    <system-out><![CDATA[txt1 bytes = 38
-txt2 bytes = 29
-txt3 bytes = 38
-txt4 bytes = 43
-txt5 bytes = 45
-txt6 bytes = 533
-dir here already
-dir here already
-]]></system-out>
-  </testcase>
-  <testcase name="basicSearchAndOrganizationTest" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.002"/>
-  <testcase name="addOldToStore" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="docTest2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="TestBasicTxtDocument" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testUndoWithArgs" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.002"/>
-  <testcase name="testUndoNoArgs" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.004"/>
-  <testcase name="testDelete" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.003"/>
-  <testcase name="testThrowException" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.003"/>
-  <testcase name="testPutDocumentStoreAsBinary2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="testThrowException2" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="removeCommandSet" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.003"/>
-  <testcase name="testPointlessDeleteEmptyUndo" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
-  <testcase name="illegal" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testStackUriDeleteOverwriteNoParams" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0"/>
-  <testcase name="testSimplePutValues" classname="edu.yu.cs.com1320.project.stage4.impl.DocumentStoreImplTest" time="0.001"/>
+  <testcase name="popExists" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.077"/>
+  <testcase name="interfaceCount" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.003"/>
+  <testcase name="methodCount" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.001"/>
+  <testcase name="noArgsConstructorExists" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.001"/>
+  <testcase name="peekExists" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.002"/>
+  <testcase name="subClassCount" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.001"/>
+  <testcase name="fieldCount" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0"/>
+  <testcase name="pushExists" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.001"/>
+  <testcase name="sizeExists" classname="edu.yu.cs.com1320.project.stage5.impl.StackImplTest" time="0.001"/>
 </testsuite>

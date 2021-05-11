@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.118" tests="10" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.123" tests="10" errors="0" skipped="0" failures="0">
   <properties>
     <property name="gopherProxySet" value="false"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk-11.0.10.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire/surefirebooter8663562645109654479.jar /Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire 2021-05-11T15-18-17_759-jvmRun1 surefire4152115460556344957tmp surefire_08344925716494716191tmp"/>
+    <property name="sun.java.command" value="/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire/surefirebooter16630723135478500858.jar /Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire 2021-05-11T15-28-19_356-jvmRun1 surefire504911247916190088tmp surefire_012347357247074467948tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/test-classes:/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/classes:/Users/adamfrenkel/.m2/repository/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar:/Users/adamfrenkel/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.7.1/junit-jupiter-api-5.7.1.jar:/Users/adamfrenkel/.m2/repository/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar:/Users/adamfrenkel/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/Users/adamfrenkel/.m2/repository/org/junit/platform/junit-platform-commons/1.7.1/junit-platform-commons-1.7.1.jar:/Users/adamfrenkel/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.7.1/junit-jupiter-engine-5.7.1.jar:/Users/adamfrenkel/.m2/repository/org/junit/platform/junit-platform-engine/1.7.1/junit-platform-engine-1.7.1.jar:/Users/adamfrenkel/.m2/repository/junit/junit/4.13/junit-4.13.jar:/Users/adamfrenkel/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/Users/adamfrenkel/.m2/repository/org/junit/vintage/junit-vintage-engine/5.7.1/junit-vintage-engine-5.7.1.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/plugins/maven-surefire-plugin/3.0.0-M5/maven-surefire-plugin-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/maven-surefire-common/3.0.0-M5/maven-surefire-common-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-api/3.0.0-M5/surefire-api-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-logger-api/3.0.0-M5/surefire-logger-api-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-extensions-api/3.0.0-M5/surefire-extensions-api-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-booter/3.0.0-M5/surefire-booter-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-extensions-spi/3.0.0-M5/surefire-extensions-spi-3.0.0-M5.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/maven-toolchain/3.0-alpha-2/maven-toolchain-3.0-alpha-2.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/shared/maven-artifact-transfer/0.11.0/maven-artifact-transfer-0.11.0.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/shared/maven-common-artifact-filters/3.0.1/maven-common-artifact-filters-3.0.1.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/maven-model/3.0/maven-model-3.0.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/maven-plugin-api/3.0/maven-plugin-api-3.0.jar:/Users/adamfrenkel/.m2/repository/org/sonatype/sisu/sisu-inject-plexus/1.4.2/sisu-inject-plexus-1.4.2.jar:/Users/adamfrenkel/.m2/repository/org/codehaus/plexus/plexus-classworlds/2.2.3/plexus-classworlds-2.2.3.jar:/Users/adamfrenkel/.m2/repository/org/sonatype/sisu/sisu-inject-bean/1.4.2/sisu-inject-bean-1.4.2.jar:/Users/adamfrenkel/.m2/repository/org/sonatype/sisu/sisu-guice/2.1.7/sisu-guice-2.1.7-noaop.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/shared/maven-shared-utils/3.1.0/maven-shared-utils-3.1.0.jar:/Users/adamfrenkel/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.jar:/Users/adamfrenkel/.m2/repository/commons-codec/commons-codec/1.11/commons-codec-1.11.jar:/Users/adamfrenkel/.m2/repository/org/codehaus/plexus/plexus-java/1.0.5/plexus-java-1.0.5.jar:/Users/adamfrenkel/.m2/repository/org/ow2/asm/asm/7.2/asm-7.2.jar:/Users/adamfrenkel/.m2/repository/com/thoughtworks/qdox/qdox/2.0-M9/qdox-2.0-M9.jar:/Users/adamfrenkel/.m2/repository/org/apache/maven/surefire/surefire-shared-utils/3.0.0-M4/surefire-shared-utils-3.0.0-M4.jar:/Users/adamfrenkel/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar:/Users/adamfrenkel/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.1/jakarta.activation-api-1.2.1.jar:/Users/adamfrenkel/.m2/repository/org/glassfish/jaxb/jaxb-runtime/2.3.2/jaxb-runtime-2.3.2.jar:/Users/adamfrenkel/.m2/repository/org/glassfish/jaxb/txw2/2.3.2/txw2-2.3.2.jar:/Users/adamfrenkel/.m2/repository/com/sun/istack/istack-commons-runtime/3.0.8/istack-commons-runtime-3.0.8.jar:/Users/adamfrenkel/.m2/repository/org/jvnet/staxex/stax-ex/1.8.1/stax-ex-1.8.1.jar:/Users/adamfrenkel/.m2/repository/com/sun/xml/fastinfoset/FastInfoset/1.2.16/FastInfoset-1.2.16.jar:"/>
@@ -33,7 +33,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.awt.graphicsenv" value="sun.awt.CGraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire/surefirebooter8663562645109654479.jar"/>
+    <property name="surefire.real.class.path" value="/Users/adamfrenkel/Desktop/Code/YU/Frenkel_Adam_800552202/DataStructures/project/stage5/target/surefire/surefirebooter16630723135478500858.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.runtime.version" value="11.0.10+8-LTS-162"/>
@@ -61,14 +61,14 @@
     <property name="java.class.version" value="55.0"/>
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
   </properties>
-  <testcase name="stage3PlainUndoThatImpactsMultiple" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.063"/>
-  <testcase name="stage3UndoByURIThatImpactsEarlierThanLast" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.009"/>
-  <testcase name="undoNthDeleteByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.014"/>
-  <testcase name="undoAfterOnePut" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.006"/>
-  <testcase name="undoNthPutByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.001"/>
-  <testcase name="undoDelete" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.002"/>
-  <testcase name="undoAfterMultiplePuts" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.001"/>
-  <testcase name="undoOverwriteByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.004"/>
-  <testcase name="undoByURIWhenEmptyShouldThrow" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.003"/>
+  <testcase name="stage3PlainUndoThatImpactsMultiple" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.068"/>
+  <testcase name="stage3UndoByURIThatImpactsEarlierThanLast" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.008"/>
+  <testcase name="undoNthDeleteByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.011"/>
+  <testcase name="undoAfterOnePut" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.009"/>
+  <testcase name="undoNthPutByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.003"/>
+  <testcase name="undoDelete" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.001"/>
+  <testcase name="undoAfterMultiplePuts" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.002"/>
+  <testcase name="undoOverwriteByURI" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.003"/>
+  <testcase name="undoByURIWhenEmptyShouldThrow" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.004"/>
   <testcase name="undoWhenEmptyShouldThrow" classname="edu.yu.cs.com1320.project.stage4.impl.UndoTest" time="0.005"/>
 </testsuite>
