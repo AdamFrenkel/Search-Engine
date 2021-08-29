@@ -7,4 +7,4 @@ to the application chronologically. • Able to undo any operation in the applic
 • Modified the Java Heap, BTree, and Trie, and built Stack and HashTable.
 
 The project was done in 5 stages over the course of the semester, the final stage can
-be found in DocumentStore/stage5.
+be found in DataStructures/project/stage5.
