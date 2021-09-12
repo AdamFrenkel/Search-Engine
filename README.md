@@ -4,7 +4,7 @@ dictionary lookup which maps words to all documents containing that word. • Us
 define a limit of how many documents can be stored in memory, if the limit is reached
 the least used document is stored on the disk in JSON format. • System tracks additions
 to the application chronologically. • Able to undo any operation in the application.
-• Modified the Java Heap, BTree, and Trie, and built Stack and HashTable.
+• Modified the Java Heap, BTree, and Trie, and built Stack and HashTable from scratch.
 
 The project was done in 5 stages over the course of the semester, the final stage can
 be found in DataStructures/project/stage5.
